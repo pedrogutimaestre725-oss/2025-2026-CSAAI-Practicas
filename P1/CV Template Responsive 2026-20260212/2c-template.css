@@ -1,0 +1,152 @@
+/* https://www.w3schools.com/howto/howto_css_two_columns.asp */
+/* https://developer.mozilla.org/es/docs/Web/CSS/box-sizing */
+/* Así definimos el comportamiento de caja para todos los elementos */
+* {
+    box-sizing: border-box;
+}
+
+/* Fuente Pokémon GBA */
+@font-face {
+    font-family: 'PokemonGB';
+    src: url('fonts/PokemonGB.ttf') format('truetype');
+}
+
+/* ========================================================
+   Estilos generales del body y fondo
+   ======================================================== */
+body {
+    font-family: 'PokemonGB', monospace;
+    font-size: 18px;
+    color: #fff; /* mejor visibilidad sobre fondo oscuro */
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+
+    /* Fondo con opacidad usando overlay */
+    background: 
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url('Fondo.jpg') center center/cover no-repeat;
+}
+
+/* ========================================================
+   Fila superior (Título "Ash Ketchum") como caja
+   ======================================================== */
+.fila-superior {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 20px;
+
+    border: 60px solid transparent;           /* borde PNG opcional */
+    border-image: url("marco.png") 60 stretch; /* reutiliza tu marco PNG */
+    box-sizing: border-box;
+}
+
+.fila-superior h1 {
+    font-family: 'PokemonGB', monospace;
+    font-size: 48px;
+    color: #fff; /* rojo Pokémon */
+    text-shadow: 2px 2px 5px black; /* contorno para resaltar */
+    margin: 0;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+/* ========================================================
+   Crear columnas izquierda/derecha
+   ======================================================== */
+.columna {
+    float: left;
+    min-height: 500px;
+    padding: 20px;
+    border: 60px solid transparent; /* borde PNG */
+    border-image: url("marco.png") 60 stretch;
+    box-sizing: border-box;
+}
+
+.izquierda {
+    width: 30%;
+}
+
+.derecha {
+    width: 70%;
+}
+
+/* Clear floats después de las columnas */
+.filla:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Columnas - fondo para distinguir */
+#c0 { background-color:#ccc; }
+#c1 { background-color:#aaa; }
+#c2 { background-color:#bbb; }
+
+
+/* Centrar títulos dentro de las columnas izquierda y derecha */
+.columna h2,
+.columna h3,
+.columna h4,
+.columna h5,
+.columna h6 {
+    text-align: center;
+    font-family: 'PokemonGB', monospace; /* opcional si quieres reforzar la fuente */
+    color: #fff; /* rojo Pokémon para destacar */
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+
+/* ========================================================
+   Imágenes dentro de columnas
+   ======================================================== */
+.columna img {
+    width: 75%;
+    height: auto;
+    display: block;
+    margin-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: cover;
+    border-radius: 8px; /* opcional */
+}
+
+/* ========================================================
+   Contenedor de imágenes responsive (columna izquierda)
+   ======================================================== */
+.iresponsive {
+    padding: 6px;
+    float: left;
+    width: 100%; /* ocupa todo el ancho de su columna */
+    box-sizing: border-box;
+}
+
+.iresponsive img {
+    width: 100%; /* escala según el contenedor */
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* ========================================================
+   Responsive - dispositivos móviles
+   ======================================================== */
+@media screen and (max-width: 600px) {
+    .columna {
+        width: 100%; /* columnas apiladas */
+    }
+
+    .columna img {
+        max-width: 100%; /* imágenes ocupan todo el ancho disponible */
+    }
+
+    .iresponsive {
+        width: 100%; /* una imagen por fila en móviles */
+    }
+}
+
+/* Más sobre diseño web responsive https://www.w3schools.com/css/css_rwd_intro.asp */
