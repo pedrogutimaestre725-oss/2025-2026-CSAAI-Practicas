@@ -1,37 +1,42 @@
-/* ========================================================
-   Reset básico
-   ======================================================== */
+/* ================================
+   Reset
+================================ */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* ========================================================
+/* ================================
    Fuente VT323
-   ======================================================== */
+================================ */
 @font-face {
     font-family: 'VT323';
-    src: url('fonts/VT323-Regular.ttf') format('truetype');
+    src: url('fonts/VT323-Regular.woff2') format('woff2'),
+         url('fonts/VT323-Regular.woff') format('woff'),
+         url('fonts/VT323-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* carga rápida y fallback */
 }
 
-/* ========================================================
-   Body (la fuente se aplica a TODO automáticamente)
-   ======================================================== */
+/* ================================
+   Body (TODO el texto usa VT323)
+================================ */
 body {
     font-family: 'VT323', monospace;
-    font-size: 22px;
-    color: #fff;
+    font-size: 19px;
+    color: #ffffff;
     line-height: 1.6;
 
     background:
-        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
         url('Fondo.jpg') center center/cover no-repeat;
 }
 
-/* ========================================================
-   Fila superior
-   ======================================================== */
+/* ================================
+   Fila superior (Título Pokémon)
+================================ */
 .fila-superior {
     width: 100%;
     display: flex;
@@ -39,12 +44,13 @@ body {
     margin-bottom: 20px;
     padding: 20px;
 
+    background-color: rgba(0,0,0,0.75);
     border: 60px solid transparent;
     border-image: url("marco.png") 60 stretch;
 }
 
 .fila-superior h1 {
-    font-size: 72px;
+    font-size: 70px;
     letter-spacing: 3px;
     color: #ffcc00;
 
@@ -58,55 +64,52 @@ body {
     text-align: center;
 }
 
-/* ========================================================
+/* ================================
    Columnas
-   ======================================================== */
+================================ */
 .columna {
     float: left;
     min-height: 500px;
     padding: 25px;
 
+    background-color: rgba(0,0,0,0.75);
     border: 60px solid transparent;
     border-image: url("marco.png") 60 stretch;
 }
 
 .izquierda { width: 30%; }
-.derecha   { width: 70%; }
 
+/* ================================
+   COLUMNA DERECHA
+================================ */
+.derecha {
+    width: 70%;
+    font-family: 'VT323', monospace;
+    font-size: 19px;
+    color: #ffffff;
+    line-height: 1.7;
+
+    background-color: rgba(0,0,0,0.75);
+
+    padding: 25px;
+}
+
+.derecha ul {
+    margin: 10px 0 20px 20px;
+}
+
+/* ================================
+   Clear floats
+================================ */
 .filla:after {
     content: "";
     display: table;
     clear: both;
 }
 
-/* Fondos */
-#c0 { background-color:#ccc; }
-#c1 { background-color:#aaa; }
-#c2 { background-color:#bbb; }
-
-/* ========================================================
-   Espaciado general texto derecha
-   ======================================================== */
-.derecha p { margin-bottom: 18px; }
-
-.derecha strong {
-    display: block;
-    margin-top: 25px;
-    margin-bottom: 8px;
-    font-size: 26px;
-    color: #ffcc00;
-}
-
-.derecha ul {
-    margin-bottom: 25px;
-    padding-left: 25px;
-}
-
-.derecha li { margin-bottom: 10px; }
-
-/* ========================================================
+/* ================================
    Imágenes
-   ======================================================== */
+================================ */
 .columna img {
     width: 75%;
     height: auto;
@@ -115,9 +118,9 @@ body {
     border-radius: 8px;
 }
 
-/* ========================================================
+/* ================================
    Responsive
-   ======================================================== */
+================================ */
 @media screen and (max-width: 600px) {
     .columna { width: 100%; }
 }
