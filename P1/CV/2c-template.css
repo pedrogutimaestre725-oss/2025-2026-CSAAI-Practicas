@@ -1,3 +1,6 @@
+/* 1. EL IMPORT SIEMPRE DEBE SER LA PRIMERA LÍNEA */
+@import url('https://fonts.googleapis.com');
+
 /* ================================
    Reset
 ================================ */
@@ -5,27 +8,16 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    /* 2. OPCIONAL: Fuerza a que TODO herede la fuente aquí */
+    font-family: 'VT323', monospace !important;
 }
-
-/* ================================
-   Fuente VT323
-================================ */
-@font-face {
-    font-family: 'VT323';
-    src: url('fonts/VT323-Regular.woff2') format('woff2'),
-         url('fonts/VT323-Regular.woff') format('woff'),
-         url('fonts/VT323-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap; /* carga rápida y fallback */
-}
-
 /* ================================
    Body (TODO el texto usa VT323)
 ================================ */
 body {
+    /* Mantenemos tus estilos */
     font-family: 'VT323', monospace;
-    font-size: 19px;
+    font-size: 24px; /* Sugerencia: VT323 se ve mejor un poco más grande */
     color: #ffffff;
     line-height: 1.6;
 
@@ -45,8 +37,10 @@ body {
     padding: 20px;
 
     background-color: rgba(0,0,0,0.75);
-    border: 60px solid transparent;
-    border-image: url("marco.png") 60 stretch;
+    border: 30px solid transparent;
+    border-image: url("Prueba.png") 30 stretch;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 .fila-superior h1 {
@@ -55,10 +49,10 @@ body {
     color: #ffcc00;
 
     text-shadow:
-        -3px -3px 0 #2a4bd7,
-         3px -3px 0 #2a4bd7,
-        -3px  3px 0 #2a4bd7,
-         3px  3px 0 #2a4bd7,
+        -3px -3px 0 #3c57cf,
+         3px -3px 0 #3c57cf,
+        -3px  3px 0 #3c57cf,
+         3px  3px 0 #3c57cf,
          0px  6px 0 black;
 
     text-align: center;
@@ -73,8 +67,10 @@ body {
     padding: 25px;
 
     background-color: rgba(0,0,0,0.75);
-    border: 60px solid transparent;
-    border-image: url("marco.png") 60 stretch;
+    border: 30px solid transparent;
+    border-image: url("Prueba.png") 30 stretch;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 .izquierda { width: 30%; }
@@ -83,19 +79,20 @@ body {
    COLUMNA DERECHA
 ================================ */
 .derecha {
-    width: 70%;
+    width: 68%;
     font-family: 'VT323', monospace;
     font-size: 19px;
+    float: right;
     color: #ffffff;
     line-height: 1.7;
 
     background-color: rgba(0,0,0,0.75);
 
-    padding: 25px;
+    padding: 20px;
 }
 
 .derecha ul {
-    margin: 10px 0 20px 20px;
+    margin: 10px 0 20px 50px;
 }
 
 /* ================================
@@ -114,10 +111,31 @@ body {
     width: 75%;
     height: auto;
     display: block;
-    margin: 0 auto 15px auto;
+    margin: 15px auto 25px auto;
     border-radius: 8px;
 }
 
+
+.izquierda h2 {color: #3c57cf;}
+.derecha h3, .derecha h4 {color: #3c57cf;}
+
+.izquierda li {
+    margin: 20px 0 10px 50px;
+    color: #ffcc00;
+}
+
+a {
+    color: inherit;      
+    text-decoration: none;   
+    font-family: 'VT323', monospace; 
+    cursor: pointer;         
+    transition: color 0.3s, opacity 0.3s;
+}
+
+a:hover {
+    color: #e0b60e;
+    opacity: 0.8;
+}
 /* ================================
    Responsive
 ================================ */
