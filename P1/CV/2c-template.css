@@ -17,10 +17,9 @@
 ================================ */
 body {
     font-family: 'VT323', monospace;
-    font-size: 26px; /* Más grande en escritorio */
+    font-size: 26px; /* tamaño base en escritorio */
     color: #ffffff;
     line-height: 1.6;
-
     background:
         linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
         url('Fondo.jpg') center center/cover no-repeat;
@@ -35,7 +34,6 @@ body {
     justify-content: center;
     margin-bottom: 20px;
     padding: 25px;
-
     background-color: rgba(0,0,0,0.8);
     border: 30px solid transparent;
     border-image: url("Prueba.png") 30 stretch;
@@ -43,20 +41,17 @@ body {
     overflow: hidden;
 }
 
-/* H1 con fuente normal (no VT323) */
 .fila-superior h1 {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 65px;
     letter-spacing: 3px;
     color: #ffcc00;
-
     text-shadow:
         -3px -3px 0 #3c57cf,
          3px -3px 0 #3c57cf,
         -3px  3px 0 #3c57cf,
          3px  3px 0 #3c57cf,
          0px  6px 0 black;
-
     text-align: center;
 }
 
@@ -67,7 +62,6 @@ body {
     float: left;
     min-height: 500px;
     padding: 25px;
-
     background-color: rgba(0,0,0,0.8);
     border: 30px solid transparent;
     border-image: url("Prueba.png") 30 stretch;
@@ -76,70 +70,46 @@ body {
 }
 
 .izquierda { width: 30%; }
-
-.derecha {
-    width: 68%;
-    float: right;
-    line-height: 1.7;
-}
-
-.derecha2 {
-    width: 90%;
-    float: none;
-    line-height: 1.7;
+.derecha { width: 68%; float: right; line-height: 1.7; }
+.derecha2 { 
+    width: 90%; 
+    float: none; 
+    line-height: 1.7; 
     margin: 10px auto;
+    padding: 20px; /* espacio interno para texto y videos */
 }
 
 /* ================================
-   Listas
+   LISTAS
 ================================ */
 ul {
     margin: 15px 0 25px 50px;
 }
-
 li {
     margin-bottom: 15px;
 }
 
 /* ================================
-   Colores
+   COLORES
 ================================ */
 .izquierda h2 { color: #3c57cf; }
-
-.derecha h3,
-.derecha h4 { color: #3c57cf; }
-
-.derecha2 h3,
-.derecha2 h4 { color: #3c57cf; }
-
+.derecha h3, .derecha h4,
+.derecha2 h3, .derecha2 h4 { color: #3c57cf; }
 .izquierda li { color: #ffcc00; }
 
 /* ================================
-   Enlaces
+   ENLACES
 ================================ */
-a {
+a, .T_img {
     color: inherit;
     text-decoration: none;
     transition: color 0.3s, opacity 0.3s;
 }
+a:hover { color: #e0b60e; opacity: 0.8; }
+.T_img:hover { opacity: 0.9999; }
 
-a:hover {
-    color: #e0b60e;
-    opacity: 0.8;
-}
-
-
-.T_img {
-    color: inherit;
-    text-decoration: none;
-    transition: color 0.3s, opacity 0.3s;
-}
-
-.T_img:hover {
-    opacity: 0.9999;
-}
 /* ================================
-   Imágenes
+   IMÁGENES
 ================================ */
 .columna img {
     width: 75%;
@@ -150,83 +120,96 @@ a:hover {
 }
 
 /* ================================
-   Clear floats
+   BOTONES
+================================ */
+.boton {
+    font-family: 'VT323', monospace;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+.boton:hover { color: #e0b60e; opacity: 0.8; }
+
+.botones-final {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ================================
+   PARÁGRAFOS
+================================ */
+.pa { margin-left: 50px; }
+
+/* ================================
+   VIDEOS
+================================ */
+.videos {
+    display: flex;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.video-col {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.video-col video {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    display: block;
+    margin-top: 20px;
+}
+
+/* ================================
+   CLEAR FLOATS
 ================================ */
 .filla:after {
     content: "";
     display: table;
     clear: both;
 }
-.boton {
-    font-family: 'VT323', monospace;
-    font-size: 24px;
-    transition: color 0.3s ease;     /* suaviza el cambio de color */
-}
-
-.boton:hover {
-    color: #e0b60e;
-    opacity: 0.8;                  /* letras amarillas al pasar el ratón */
-}
-
-.botones-final {
-    display: flex;                  
-    justify-content: space-between; 
-}
-.pa{ margin-left: 50px;}
-
-.columna.derecha2 {
-    padding: 20px; /* espacio interno entre texto y bordes */
-}
-
-.videos {
-    display: flex;           /* coloca los videos en línea */
-    margin-top: 20px;        /* separación del párrafo anterior */
-    justify-content: center; /* centra todo el contenedor */
-}
-
-.video-col {
-    flex: 1;                 /* cada columna ocupa la misma proporción */
-    display: flex;           /* flex para centrar el video dentro de la columna */
-    justify-content: center; /* centra el video horizontalmente */
-}
-
-.video-col video {
-    width: 100%;
-    max-width: 400px;        /* tamaño máximo */
-    height: auto;
-    display: block;
-    margin-top: 20px;        /* separa del párrafo de arriba */
-}
 
 /* ================================
    RESPONSIVE
 ================================ */
 
-/* Tablet */
+/* TABLET */
 @media screen and (max-width: 768px) {
 
-    body {
-        font-size: 22px;
+    body { font-size: 22px; }
+
+    .columna { width: 100%; float: none; }
+    .derecha2 { width: 95%; padding: 15px; }
+
+    .fila-superior h1 { font-size: 50px; }
+    
+    .videos {
+        flex-direction: column;
+        margin-top: 15px;
+    }
+    
+    .video-col {
+        justify-content: center;
+        margin-bottom: 20px; /* separación entre videos en vertical */
     }
 
-    .columna {
-        width: 100%;
-        float: none;
-    }
-
-    .fila-superior h1 {
-        font-size: 50px;
-    }
+    .video-col video { max-width: 90%; }
 }
 
-/* Móvil */
+/* MÓVIL */
 @media screen and (max-width: 480px) {
 
-    body {
-        font-size: 18px;
-    }
+    body { font-size: 18px; }
 
-    .fila-superior h1 {
-        font-size: 38px;
-    }
+    .fila-superior h1 { font-size: 38px; }
+
+    .pa { margin-left: 20px; }
+
+    .derecha2 { width: 100%; padding: 10px; }
+
+    .video-col video { max-width: 100%; }
+    
+    .boton { font-size: 20px; }
 }
