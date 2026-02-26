@@ -175,6 +175,7 @@ a:hover { color: #e0b60e; opacity: 0.8; }
    RESPONSIVE
 ================================ */
 
+
 /* TABLET */
 @media screen and (max-width: 768px) {
 
@@ -183,8 +184,16 @@ a:hover { color: #e0b60e; opacity: 0.8; }
     .columna { width: 100%; float: none; }
     .derecha2 { width: 95%; padding: 15px; }
 
+    /* Ajuste fila superior */
+    .fila-superior {
+        border: 15px solid transparent;           /* borde más fino */
+        border-image: url("Prueba.png") 15 round; /* repetir en lugar de estirar */
+        border-radius: 12px;
+        padding: 20px;                             /* ajustar padding */
+    }
+
     .fila-superior h1 { font-size: 50px; }
-    
+
     .videos {
         flex-direction: column;
         margin-top: 15px;
@@ -202,6 +211,14 @@ a:hover { color: #e0b60e; opacity: 0.8; }
 @media screen and (max-width: 480px) {
 
     body { font-size: 18px; }
+
+    /* Ajuste fila superior */
+    .fila-superior {
+        border: 10px solid transparent;          /* borde más fino */
+        border-image: url("Prueba.png") 10 round; /* repetir borde */
+        border-radius: 10px;
+        padding: 15px;                            /* padding reducido */
+    }
 
     .fila-superior h1 { font-size: 38px; }
 
