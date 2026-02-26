@@ -47,11 +47,11 @@ body {
     letter-spacing: 3px;
     color: #ffcc00;
     text-shadow:
-        -3px -3px 0 #3c57cf,
-         3px -3px 0 #3c57cf,
-        -3px  3px 0 #3c57cf,
-         3px  3px 0 #3c57cf,
-         0px  6px 0 black;
+        -0.046em -0.046em 0 #3c57cf,
+         0.046em -0.046em 0 #3c57cf,
+        -0.046em  0.046em 0 #3c57cf,
+         0.046em  0.046em 0 #3c57cf,
+         0em     0.092em 0 black;
     text-align: center;
 }
 
