@@ -157,6 +157,46 @@ a:hover {
     display: table;
     clear: both;
 }
+.boton {
+    font-family: 'VT323', monospace;
+    font-size: 24px;
+    transition: color 0.3s ease;     /* suaviza el cambio de color */
+}
+
+.boton:hover {
+    color: #e0b60e;
+    opacity: 0.8;                  /* letras amarillas al pasar el ratón */
+}
+
+.botones-final {
+    display: flex;                  
+    justify-content: space-between; 
+}
+.pa{ margin-left: 50px;}
+
+.columna.derecha2 {
+    padding: 20px; /* espacio interno entre texto y bordes */
+}
+
+.videos {
+    display: flex;           /* coloca los videos en línea */
+    margin-top: 20px;        /* separación del párrafo anterior */
+    justify-content: center; /* centra todo el contenedor */
+}
+
+.video-col {
+    flex: 1;                 /* cada columna ocupa la misma proporción */
+    display: flex;           /* flex para centrar el video dentro de la columna */
+    justify-content: center; /* centra el video horizontalmente */
+}
+
+.video-col video {
+    width: 100%;
+    max-width: 400px;        /* tamaño máximo */
+    height: auto;
+    display: block;
+    margin-top: 20px;        /* separa del párrafo de arriba */
+}
 
 /* ================================
    RESPONSIVE
