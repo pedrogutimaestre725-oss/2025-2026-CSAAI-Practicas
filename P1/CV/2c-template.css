@@ -17,7 +17,7 @@
 ================================ */
 body {
     font-family: 'VT323', monospace;
-    font-size: 26px; /* tamaño base en escritorio */
+    font-size: 26px;
     color: #ffffff;
     line-height: 1.6;
     background:
@@ -35,8 +35,12 @@ body {
     margin-bottom: 20px;
     padding: 25px;
     background-color: rgba(0,0,0,0.8);
+
     border: 30px solid transparent;
-    border-image: url("Prueba.png") 30 stretch;
+    border-image-source: url("Prueba.png");
+    border-image-slice: 30;
+    border-image-repeat: round;
+
     border-radius: 15px;
     overflow: hidden;
 }
@@ -63,20 +67,25 @@ body {
     min-height: 500px;
     padding: 25px;
     background-color: rgba(0,0,0,0.8);
+
     border: 30px solid transparent;
-    border-image: url("Prueba.png") 30 stretch;
+    border-image-source: url("Prueba.png");
+    border-image-slice: 30;
+    border-image-repeat: round;
+
     border-radius: 15px;
     overflow: hidden;
 }
 
 .izquierda { width: 30%; }
 .derecha { width: 68%; float: right; line-height: 1.7; }
+
 .derecha2 { 
     width: 90%; 
     float: none; 
     line-height: 1.7; 
     margin: 10px auto;
-    padding: 20px; /* espacio interno para texto y videos */
+    padding: 20px;
 }
 
 /* ================================
@@ -85,6 +94,7 @@ body {
 ul {
     margin: 15px 0 25px 50px;
 }
+
 li {
     margin-bottom: 15px;
 }
@@ -93,8 +103,10 @@ li {
    COLORES
 ================================ */
 .izquierda h2 { color: #3c57cf; }
+
 .derecha h3, .derecha h4,
 .derecha2 h3, .derecha2 h4 { color: #3c57cf; }
+
 .izquierda li { color: #ffcc00; }
 
 /* ================================
@@ -105,6 +117,7 @@ a, .T_img {
     text-decoration: none;
     transition: color 0.3s, opacity 0.3s;
 }
+
 a:hover { color: #e0b60e; opacity: 0.8; }
 .T_img:hover { opacity: 0.9999; }
 
@@ -127,6 +140,7 @@ a:hover { color: #e0b60e; opacity: 0.8; }
     font-size: 24px;
     transition: color 0.3s ease;
 }
+
 .boton:hover { color: #e0b60e; opacity: 0.8; }
 
 .botones-final {
@@ -175,21 +189,24 @@ a:hover { color: #e0b60e; opacity: 0.8; }
    RESPONSIVE
 ================================ */
 
-
 /* TABLET */
 @media screen and (max-width: 768px) {
 
     body { font-size: 22px; }
 
-    .columna { width: 100%; float: none; }
-    .derecha2 { width: 95%; padding: 15px; }
+    .columna { 
+        width: 100%; 
+        float: none; 
+    }
 
-    /* Ajuste fila superior */
+    .derecha2 { 
+        width: 95%; 
+        padding: 15px; 
+    }
+
     .fila-superior {
-        border: 15px solid transparent;           /* borde más fino */
-        border-image: url("Prueba.png") 15 round; /* repetir en lugar de estirar */
-        border-radius: 12px;
-        padding: 20px;                             /* ajustar padding */
+        border-width: 20px; /* SOLO reducimos grosor */
+        padding: 20px;
     }
 
     .fila-superior h1 { font-size: 50px; }
@@ -201,7 +218,7 @@ a:hover { color: #e0b60e; opacity: 0.8; }
     
     .video-col {
         justify-content: center;
-        margin-bottom: 20px; /* separación entre videos en vertical */
+        margin-bottom: 20px;
     }
 
     .video-col video { max-width: 90%; }
@@ -212,19 +229,19 @@ a:hover { color: #e0b60e; opacity: 0.8; }
 
     body { font-size: 18px; }
 
-    /* Ajuste fila superior */
     .fila-superior {
-        border: 10px solid transparent;          /* borde más fino */
-        border-image: url("Prueba.png") 10 round; /* repetir borde */
-        border-radius: 10px;
-        padding: 15px;                            /* padding reducido */
+        border-width: 15px; /* SOLO reducimos grosor */
+        padding: 15px;
     }
 
     .fila-superior h1 { font-size: 38px; }
 
     .pa { margin-left: 20px; }
 
-    .derecha2 { width: 100%; padding: 10px; }
+    .derecha2 { 
+        width: 100%; 
+        padding: 10px; 
+    }
 
     .video-col video { max-width: 100%; }
     
