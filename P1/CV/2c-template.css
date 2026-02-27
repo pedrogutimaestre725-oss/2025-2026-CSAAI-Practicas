@@ -37,9 +37,7 @@ body {
     background-color: rgba(0,0,0,0.8);
 
     border: 30px solid transparent;
-    border-image-source: url("Prueba.png");
-    border-image-slice: 30;
-    border-image-repeat: round;
+    border-image: url("Prueba.png") 30 stretch;
 
     border-radius: 15px;
     overflow: hidden;
@@ -69,9 +67,7 @@ body {
     background-color: rgba(0,0,0,0.8);
 
     border: 30px solid transparent;
-    border-image-source: url("Prueba.png");
-    border-image-slice: 30;
-    border-image-repeat: round;
+    border-image: url("Prueba.png") 30 stretch;
 
     border-radius: 15px;
     overflow: hidden;
@@ -92,9 +88,8 @@ body {
    LISTAS
 ================================ */
 ul {
-    margin: 15px 0 25px 50px;
+    margin: 15px 0 25px 40px;
 }
-
 li {
     margin-bottom: 15px;
 }
@@ -105,7 +100,9 @@ li {
 .izquierda h2 { color: #3c57cf; }
 
 .derecha h3, .derecha h4,
-.derecha2 h3, .derecha2 h4 { color: #3c57cf; }
+.derecha2 h3, .derecha2 h4 { 
+    color: #3c57cf; 
+}
 
 .izquierda li { color: #ffcc00; }
 
@@ -118,8 +115,14 @@ a, .T_img {
     transition: color 0.3s, opacity 0.3s;
 }
 
-a:hover { color: #e0b60e; opacity: 0.8; }
-.T_img:hover { opacity: 0.9999; }
+a:hover { 
+    color: #e0b60e; 
+    opacity: 0.8; 
+}
+
+.T_img:hover { 
+    opacity: 0.9999; 
+}
 
 /* ================================
    IMÁGENES
@@ -141,7 +144,10 @@ a:hover { color: #e0b60e; opacity: 0.8; }
     transition: color 0.3s ease;
 }
 
-.boton:hover { color: #e0b60e; opacity: 0.8; }
+.boton:hover { 
+    color: #e0b60e; 
+    opacity: 0.8; 
+}
 
 .botones-final {
     display: flex;
@@ -151,7 +157,9 @@ a:hover { color: #e0b60e; opacity: 0.8; }
 /* ================================
    PARÁGRAFOS
 ================================ */
-.pa { margin-left: 50px; }
+.pa { 
+    margin-left: 50px; 
+}
 
 /* ================================
    VIDEOS
@@ -204,12 +212,20 @@ a:hover { color: #e0b60e; opacity: 0.8; }
         padding: 15px; 
     }
 
+    /* Solo reducimos grosor del borde */
     .fila-superior {
-        border-width: 20px; /* SOLO reducimos grosor */
-        padding: 20px;
+        border: 20px solid transparent;
+        border-image: url("Prueba.png") 30 stretch;
     }
 
-    .fila-superior h1 { font-size: 50px; }
+    .columna {
+        border: 20px solid transparent;
+        border-image: url("Prueba.png") 30 stretch;
+    }
+
+    .fila-superior h1 { 
+        font-size: 50px; 
+    }
 
     .videos {
         flex-direction: column;
@@ -221,7 +237,9 @@ a:hover { color: #e0b60e; opacity: 0.8; }
         margin-bottom: 20px;
     }
 
-    .video-col video { max-width: 90%; }
+    .video-col video { 
+        max-width: 90%; 
+    }
 }
 
 /* MÓVIL */
@@ -229,21 +247,35 @@ a:hover { color: #e0b60e; opacity: 0.8; }
 
     body { font-size: 18px; }
 
+    /* Solo reducimos grosor del borde */
     .fila-superior {
-        border-width: 15px; /* SOLO reducimos grosor */
-        padding: 15px;
+        border: 15px solid transparent;
+        border-image: url("Prueba.png") 30 stretch;
     }
 
-    .fila-superior h1 { font-size: 38px; }
+    .columna {
+        border: 15px solid transparent;
+        border-image: url("Prueba.png") 30 stretch;
+    }
 
-    .pa { margin-left: 20px; }
+    .fila-superior h1 { 
+        font-size: 38px; 
+    }
+
+    .pa { 
+        margin-left: 20px; 
+    }
 
     .derecha2 { 
         width: 100%; 
         padding: 10px; 
     }
 
-    .video-col video { max-width: 100%; }
+    .video-col video { 
+        max-width: 100%; 
+    }
     
-    .boton { font-size: 20px; }
+    .boton { 
+        font-size: 20px; 
+    }
 }
