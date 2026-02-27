@@ -197,34 +197,33 @@ a:hover {
    RESPONSIVE
 ================================ */
 
-/* TABLET */
+/* ================================
+   TABLET
+================================ */
 @media screen and (max-width: 768px) {
 
-    body { font-size: 22px; }
-
-    .columna { 
-        width: 100%; 
-        float: none; 
-    }
-
-    .derecha2 { 
-        width: 95%; 
-        padding: 15px; 
-    }
-
-    /* Solo reducimos grosor del borde */
-    .fila-superior {
-        border: 20px solid transparent;
-        border-image: url("Prueba.png") 30 stretch;
+    body {
+        font-size: 22px;
     }
 
     .columna {
-        border: 20px solid transparent;
-        border-image: url("Prueba.png") 30 stretch;
+        width: 100%;
+        float: none;
+        margin-bottom: 25px; /* separación vertical */
     }
 
-    .fila-superior h1 { 
-        font-size: 50px; 
+    .derecha2 {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .fila-superior {
+        border-width: 20px; /* mantiene proporción */
+        padding: 20px;
+    }
+
+    .fila-superior h1 {
+        font-size: 50px;
     }
 
     .videos {
@@ -237,45 +236,49 @@ a:hover {
         margin-bottom: 20px;
     }
 
-    .video-col video { 
-        max-width: 90%; 
+    .video-col video {
+        max-width: 90%;
     }
 }
 
-/* MÓVIL */
+/* ================================
+   MÓVIL
+================================ */
 @media screen and (max-width: 480px) {
 
-    body { font-size: 18px; }
-
-    /* Solo reducimos grosor del borde */
-    .fila-superior {
-        border: 15px solid transparent;
-        border-image: url("Prueba.png") 30 stretch;
+    body {
+        font-size: 18px;
     }
 
     .columna {
-        border: 15px solid transparent;
-        border-image: url("Prueba.png") 30 stretch;
+        width: 100%;
+        float: none;
+        margin-bottom: 20px; /* separación vertical */
     }
 
-    .fila-superior h1 { 
-        font-size: 38px; 
+    .derecha2 {
+        width: 100%;
+        padding: 10px;
     }
 
-    .pa { 
-        margin-left: 20px; 
+    .fila-superior {
+        border-width: 15px; /* proporcional al diseño */
+        padding: 15px;
     }
 
-    .derecha2 { 
-        width: 100%; 
-        padding: 10px; 
+    .fila-superior h1 {
+        font-size: 38px;
     }
 
-    .video-col video { 
-        max-width: 100%; 
+    .pa {
+        margin-left: 20px;
+    }
+
+    .video-col video {
+        max-width: 100%;
     }
     
-    .boton { 
-        font-size: 20px; 
+    .boton {
+        font-size: 20px;
     }
 }
