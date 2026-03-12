@@ -1,4 +1,6 @@
-/* RESET */
+/* =========================
+   RESET
+   ========================= */
 *{
     box-sizing:border-box;
     margin:0;
@@ -6,15 +8,17 @@
 }
 
 html,body{
-    height:100%;
+    min-height:100%;
 }
 
 body{
     background:url('Fondo.jpg') center/cover no-repeat;
-    overflow:hidden;
+    overflow:auto;
 }
 
-/* CONTENEDOR */
+/* =========================
+   CONTENEDOR
+   ========================= */
 .padre{
     display:flex;
     flex-direction:column;
@@ -22,7 +26,9 @@ body{
     gap:8px;
 }
 
-/* FILAS SUPERIOR Y CENTRAL (comparten flex centrado) */
+/* =========================
+   FILAS
+   ========================= */
 .fila-superior,
 .fila-central{
     display:flex;
@@ -31,71 +37,323 @@ body{
     margin:auto;
 }
 
-/* TITULO */
+/* =========================
+   TITULO
+   ========================= */
 .fila-superior{
     flex:0 0 18%;
     width:60%;
     padding:10px 20px;
+
     font-size:2.4em;
-    border:5px solid #000;
+    font-weight:bold;
+    letter-spacing:2px;
+    text-align:center;
+    color:#dc2af4;
+
+    background:linear-gradient(to bottom,#ffffff,#e0e0ff);
+    border:4px solid #dc2af4;
     border-radius:18px;
+
+    box-shadow:
+        0 8px 15px rgba(0,0,0,.35),
+        inset 0 -3px 5px rgba(255,255,255,.5);
+
+    text-shadow:
+        1px 1px 0 #fff,
+        2px 2px 0 #b0b0b0,
+        4px 4px 8px rgba(0,0,0,.3);
 }
 
-/* FILA PIN */
+/* =========================
+   FILA PIN
+   ========================= */
 .fila-central{
     flex:0 0 15%;
     width:35%;
-    gap:15px;
+    gap:25px;
 }
 
 .recuadro-pin{
-    width:65px;
-    height:65px;
-    font:30px center;
+    width:60px;
+    height:60px;
+    font-size:1.8em;
     text-align:center;
-    border:3px solid #333;
+
+    border:3px solid #dc2af4;
     border-radius:10px;
-    background:rgba(255,255,255,.85);
+
+    background:linear-gradient(to bottom,#f5f5ff,#d6c8ff);
+
+    box-shadow:
+        0 6px 10px rgba(0,0,0,.3),
+        inset 0 -2px 4px rgba(255,255,255,.5);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-/* LINEA */
+/* =========================
+   LINEA DIVISORIA
+   ========================= */
 .linea-divisoria{
     width:50%;
     height:4px;
     margin:5px auto 15px;
-    background:#000;
+    background:#dc2af4;
     border-radius:3px;
+    box-shadow:0 3px 5px rgba(0,0,0,.25);
 }
 
-/* TECLADO */
+/* =========================
+   FILA INFO (TIMER + INTENTOS)
+   ========================= */
+.fila-info{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+
+    width:35%;
+    margin:4px auto;
+
+    font-size:1.1em;
+    font-weight:bold;
+    color:#dc2af4;
+}
+
+.temporizador,
+.intentos{
+    padding:6px 14px;
+    border:2px solid #dc2af4;
+    border-radius:10px;
+
+    background:linear-gradient(to bottom,#ffffff,#e0e0ff);
+    box-shadow:0 4px 6px rgba(0,0,0,.2);
+}
+
+/* =========================
+   TECLADO
+   ========================= */
 .fila-inferior{
-    flex:1;
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    grid-template-rows:repeat(5,70px);
-    width:50%;
+    grid-template-rows:repeat(5,60px);
+
+    width:45%;
     margin:auto;
-    gap:6px;
+
+    gap:5px;
     justify-items:center;
     align-content:start;
 }
 
-/* BOTONES */
+/* =========================
+   BOTONES
+   ========================= */
 .boton{
     width:100%;
-    height:65px;
-    font-size:1.8em;
-    border:2px solid #333;
-    border-radius:10px;
-    background:rgba(255,255,255,.9);
+    height:55px;
+    font-size:1.5em;
+    font-weight:600;
+
+    color:#dc2af4;
+    border:2px solid #9b59b6;
+    border-radius:12px;
+
+    background:linear-gradient(to bottom,#7d3c98,#8e44ad 50%,#a569bd);
+    box-shadow:0 3px 6px rgba(0,0,0,.25);
+
     cursor:pointer;
-    transition:transform .1s, background .2s;
+    transition:all .15s ease;
 }
 
 .boton:hover{
-    background:#fff;
+    background:linear-gradient(to bottom,#8e44ad,#9b59b6 50%,#b085d1);
+    box-shadow:0 4px 8px rgba(0,0,0,.3);
 }
 
 .boton:active{
-    transform:scale(.95);
+    transform:translateY(4px) scale(.96);
+    box-shadow:
+        0 1px 0 #999,
+        0 2px 4px rgba(0,0,0,.25);
+}
+
+/* =========================
+   FILA EXPLICACION
+   ========================= */
+.fila-explicacion{
+    flex:1;
+    width:60%;
+    margin:10px auto;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    color:#dc2af4;
+}
+
+/* =========================
+   BOCADILLO
+   ========================= */
+.bocadillo{
+    width:100%;
+    max-width:800px;
+
+    background:rgba(255,255,255,0.92);
+    border:3px solid #dc2af4;
+    border-radius:15px;
+
+    padding:18px;
+
+    font-size:0.95em;
+    line-height:1.4;
+    text-align:center;
+
+    box-shadow:0 6px 12px rgba(0,0,0,.25);
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+}
+
+.bocadillo p{
+    margin-bottom:5px;
+}
+
+.bocadillo img{
+    width:300px;
+    height:150px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+/* =========================
+   POPUP / MODAL
+   ========================= */
+.popup{
+    display:none;
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,.75);
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:999;
+}
+
+.popup-contenido{
+    position:relative;
+
+    background:linear-gradient(to bottom,#ffffff,#e0e0ff);
+    border:4px solid #dc2af4;
+    border-radius:18px;
+
+    padding:25px;
+    width:90%;
+    max-width:420px;
+
+    text-align:center;
+
+    box-shadow:
+        0 10px 20px rgba(0,0,0,.4),
+        inset 0 -3px 5px rgba(255,255,255,.5);
+
+    animation:popupAparecer .3s ease;
+}
+
+.popup-contenido h2{
+    color:#dc2af4;
+    margin-bottom:10px;
+}
+
+.popup-contenido p{
+    margin-bottom:10px;
+}
+
+.popup-contenido img,
+.popup-contenido video{
+    width:100%;
+    max-width:260px;
+    height:auto;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+#cerrarPopup{
+    position:absolute;
+    top:6px;
+    right:8px;
+
+    font-size:32px; /* aumentado */
+    font-weight:bold;
+
+    cursor:pointer;
+    color:#dc2af4;
+}
+
+/* =========================
+   ANIMACION POPUP
+   ========================= */
+@keyframes popupAparecer{
+    from{transform:scale(.7);opacity:0;}
+    to{transform:scale(1);opacity:1;}
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+/* TABLETS */
+@media (max-width:1024px){
+    .fila-superior{width:75%;font-size:2em;}
+    .fila-central{width:50%;}
+    .recuadro-pin{width:55px;height:55px;font-size:24px;}
+    .fila-inferior{width:70%;grid-template-rows:repeat(5,65px);}
+    .boton{height:60px;font-size:1.6em;}
+    .fila-explicacion{width:75%;}
+    .bocadillo{max-width:700px;font-size:0.9em;padding:15px;}
+    .bocadillo img{width:250px;height:125px;}
+    .popup-contenido{max-width:360px;}
+    .fila-info{width:60%;font-size:1.1em;gap:20px;}
+    #cerrarPopup{font-size:28px;top:6px;right:6px;}
+}
+
+/* MOVILES */
+@media (max-width:768px){
+    .fila-superior{width:90%;font-size:1.6em;}
+    .fila-central{width:70%;gap:10px;}
+    .recuadro-pin{width:45px;height:45px;font-size:20px;}
+    .linea-divisoria{width:70%;}
+    .fila-inferior{width:85%;grid-template-rows:repeat(5,60px);gap:5px;}
+    .boton{height:55px;font-size:1.4em;}
+    .fila-explicacion{width:85%;}
+    .bocadillo{max-width:600px;font-size:0.85em;padding:12px;}
+    .bocadillo img{width:220px;height:110px;}
+    .fila-info{width:60%;font-size:1.1em;gap:20px;}
+    #cerrarPopup{font-size:30px;top:6px;right:6px;}
+}
+
+/* MOVILES PEQUEÑOS */
+@media (max-width:480px){
+    .fila-superior{font-size:1.3em;padding:8px;}
+    .fila-central{width:85%;}
+    .recuadro-pin{width:38px;height:38px;font-size:18px;}
+    .fila-inferior{width:95%;grid-template-rows:repeat(5,55px);}
+    .boton{height:50px;font-size:1.2em;}
+    .fila-explicacion{width:95%;}
+    .bocadillo{font-size:0.8em;padding:10px;}
+    .bocadillo img{width:200px;height:100px;}
+    .popup-contenido{font-size:0.9em;padding:18px;}
+    .fila-info{width:60%;font-size:1.1em;gap:20px;}
+    #cerrarPopup{font-size:28px;top:4px;right:6px;}
 }

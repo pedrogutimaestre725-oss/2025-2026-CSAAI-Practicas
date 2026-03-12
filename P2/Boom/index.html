@@ -8,7 +8,7 @@
     
     <!-- Hoja de estilo -->
     <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="Pokeball.ico" type="image/x-icon">    
+    <link rel="shortcut icon" href="Brainroot.ico" type="image/x-icon">    
 
 </head>
 <body>
@@ -23,6 +23,17 @@
             <input type="text" class="recuadro-pin" readonly>
             <input type="text" class="recuadro-pin" readonly>
         </div>
+        <div class="fila-info">
+
+            <div class="temporizador">
+                ⏱ Tiempo: <span id="timer">00:00:00</span>
+            </div>
+
+            <div class="intentos">
+                🎯 Intentos restantes: <span id="intentos">7</span>
+            </div>
+
+        </div>
         <div class="linea-divisoria"></div>
         <div class="fila-inferior">
             <button class="boton">9</button>
@@ -34,13 +45,52 @@
             <button class="boton">3</button>
             <button class="boton">2</button>
             <button class="boton">1</button>
-            <button class="boton"></button>
+            <button class="boton" id="infoBtn"></button>
             <button class="boton">0</button>
             <button class="boton"></button>
             <button class="boton">Start</button>
             <button class="boton">Stop</button>
             <button class="boton">Reset</button>
         </div>
+        <div class="fila-explicacion">
+
+            <div class="bocadillo">
+
+                <p>Hola aventurero, mi nombre es <strong>Fregata Spaghetti</strong>, Dios de los Brainroots. </p>
+
+                <p>Tu mision consiste en descubrir el <strong>PIN</strong> secreto para salvar a <strong>Tralalerotralala</strong> 
+                    y sus Tralaleritos de las garras de <strong>TungTungTung Sahur</strong>. 
+                    Tu objetivo será introducir la combinación correcta antes de que sea demasiado tarde.</p>
+
+                <p>Cada segundo cuenta, así que cuando pulses <strong>START</strong> 
+                    asegúrate de estar preparado, ya que tu misión comenzará de inmediato. Recuerda: todo el universo Brainroot depende de ti. ¡Suerte!</p>
+
+                <img src="imagen.gif">
+
+            </div>
+
+        </div>
     </div>
+
+    <div id="popup" class="popup">
+        <div class="popup-contenido">
+            <span id="cerrarPopup">&times;</span>
+            <h2><strong>Encontraste el Final Oculto</strong></h2>
+            <p>Con esta accion conseguiste llamar a la policia justo a tiempo para que detengan a <strong>TungTungTung Sahur</strong>.</p>
+            <p> <strong>Tralalerotralala</strong> y sus Tralaleritos ya no sufriran más. Eres un Héroe, <strong>¡Gracias!</strong></p>
+            <img src="Egg.gif" alt="mensaje secreto">
+        </div>
+    </div>
+
+    <div id="popup2" class="popup">
+        <div class="popup-contenido">
+            <span id="cerrarPopup2">&times;</span>
+            <video width="480" height="270" controls autoplay>
+                <source src="God.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <script src="crono.js"></script>
 </body>
 </html>
