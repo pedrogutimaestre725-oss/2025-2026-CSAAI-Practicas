@@ -1,125 +1,101 @@
-/* Asegura que padding y border no aumenten tamaño */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* RESET */
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-html, body {
-    height: 100%;
+html,body{
+    height:100%;
 }
 
-body {
-    background-image: url('Fondo.jpg');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    overflow: hidden;
+body{
+    background:url('Fondo.jpg') center/cover no-repeat;
+    overflow:hidden;
 }
 
-/* CONTENEDOR PRINCIPAL */
-.padre {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    gap: 8px;
+/* CONTENEDOR */
+.padre{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+    gap:8px;
+}
+
+/* FILAS SUPERIOR Y CENTRAL (comparten flex centrado) */
+.fila-superior,
+.fila-central{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:auto;
 }
 
 /* TITULO */
-.fila-superior {
-    flex: 0 0 18%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 2.4em;
-
-    border: 5px solid black;
-    border-radius: 18px;
-
-    width: 60%;
-    margin: 0 auto;
-
-    padding: 10px 20px;
+.fila-superior{
+    flex:0 0 18%;
+    width:60%;
+    padding:10px 20px;
+    font-size:2.4em;
+    border:5px solid #000;
+    border-radius:18px;
 }
 
 /* FILA PIN */
-.fila-central {
-    flex: 0 0 15%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    gap: 15px;
-
-    width: 35%;
-    margin: 0 auto;
+.fila-central{
+    flex:0 0 15%;
+    width:35%;
+    gap:15px;
 }
 
-.recuadro-pin {
-    width: 65px;
-    height: 65px;
-
-    text-align: center;
-    font-size: 30px;
-
-    border: 3px solid #333;
-    border-radius: 10px;
-
-    background-color: rgba(255,255,255,0.85);
+.recuadro-pin{
+    width:65px;
+    height:65px;
+    font:30px center;
+    text-align:center;
+    border:3px solid #333;
+    border-radius:10px;
+    background:rgba(255,255,255,.85);
 }
 
-/* LINEA DIVISORIA */
-.linea-divisoria {
-    width: 50%;
-    height: 4px;
-
-    background-color: black;
-
-    margin: 5px auto 15px auto;
-
-    border-radius: 3px;
+/* LINEA */
+.linea-divisoria{
+    width:50%;
+    height:4px;
+    margin:5px auto 15px;
+    background:#000;
+    border-radius:3px;
 }
 
 /* TECLADO */
-.fila-inferior {
-    flex: 1;
-
-    display: grid;
-
-    width: 50%;
-    margin: 0 auto;
-
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(5, 70px);
-
-    justify-items: center;
-    align-content: start;
-
-    gap: 6px; /* BOTONES MAS JUNTOS */
+.fila-inferior{
+    flex:1;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(5,70px);
+    width:50%;
+    margin:auto;
+    gap:6px;
+    justify-items:center;
+    align-content:start;
 }
 
 /* BOTONES */
-.boton {
-    width: 100%;
-    height: 65px;
-
-    font-size: 1.8em;
-
-    border-radius: 10px;
-    border: 2px solid #333;
-
-    background-color: rgba(255,255,255,0.9);
-
-    cursor: pointer;
-
-    transition: transform 0.1s, background-color 0.2s;
+.boton{
+    width:100%;
+    height:65px;
+    font-size:1.8em;
+    border:2px solid #333;
+    border-radius:10px;
+    background:rgba(255,255,255,.9);
+    cursor:pointer;
+    transition:transform .1s, background .2s;
 }
 
-.boton:hover {
-    background-color: rgba(255,255,255,1);
+.boton:hover{
+    background:#fff;
 }
 
-.boton:active {
-    transform: scale(0.95);
+.boton:active{
+    transform:scale(.95);
 }
