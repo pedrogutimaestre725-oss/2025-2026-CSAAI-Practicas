@@ -23,11 +23,17 @@ const cerrar2 = document.getElementById('cerrarPopup2');
 
 infoBtn2.addEventListener('click', () => {
     popup2.style.display = 'flex';
+    const video = popup2.querySelector('video');
+    video.play().catch(err => {
+        // En móviles, a veces la reproducción automática falla
+        console.log("Reproducción automática bloqueada:", err);
+    });
 });
 
 cerrar2.addEventListener('click', () => {
     const video = popup2.querySelector('video');
-    video.pause(); // pausa el video al cerrar
+    video.pause();              // Pausa el video al cerrar
+    video.currentTime = 0;      // Reinicia el video al principio
     popup2.style.display = 'none';
 });
 
@@ -36,6 +42,7 @@ popup2.addEventListener('click', (e) => {
     if(e.target === popup2){
         const video = popup2.querySelector('video');
         video.pause();
+        video.currentTime = 0;  // Reinicia el video al principio
         popup2.style.display = 'none';
     }
 });
