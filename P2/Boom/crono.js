@@ -1,206 +1,308 @@
 // =======================
 // POPUP NORMAL
 // =======================
-const botonInfo = document.getElementById("infoBtn");
-const popup = document.getElementById("popup");
-const cerrar = document.getElementById("cerrarPopup");
+var botonInfo = document.getElementById("infoBtn");
+var popup = document.getElementById("popup");
+var cerrar = document.getElementById("cerrarPopup");
 
-botonInfo.addEventListener("click", () => {
+botonInfo.onclick = function() {
     popup.style.display = "flex";
-});
+};
 
-cerrar.addEventListener("click", () => {
+cerrar.onclick = function() {
     popup.style.display = "none";
-});
+};
 
-window.addEventListener("click", (e) => {
-    if(e.target == popup){
+window.onclick = function(e) {
+    if (e.target == popup) {
         popup.style.display = "none";
     }
-});
+};
+
+// =======================
+// BOTONES
+// =======================
+var botones = document.querySelectorAll(".boton");
 
 // =======================
 // POPUP VIDEO
 // =======================
-const infoBtn2 = document.querySelectorAll('.boton')[11];
-const popup2 = document.getElementById('popup2');
-const cerrar2 = document.getElementById('cerrarPopup2');
+var popup2 = document.getElementById("popup2");
+var cerrar2 = document.getElementById("cerrarPopup2");
 
-infoBtn2.addEventListener('click', () => {
-    popup2.style.display = 'flex';
-    const video = popup2.querySelector('video');
-    video.play().catch(()=>{});
-});
+if (botones[11]) {
+    botones[11].onclick = function() {
+        popup2.style.display = "flex";
+        var video = popup2.getElementsByTagName("video")[0];
+        if (video) video.play();
+    };
+}
 
-cerrar2.addEventListener('click', () => {
-    const video = popup2.querySelector('video');
-    video.pause();
-    video.currentTime = 0;
-    popup2.style.display = 'none';
-});
-
-popup2.addEventListener('click', (e) => {
-    if(e.target === popup2){
-        const video = popup2.querySelector('video');
+cerrar2.onclick = function() {
+    var video = popup2.getElementsByTagName("video")[0];
+    if (video) {
         video.pause();
         video.currentTime = 0;
-        popup2.style.display = 'none';
     }
-});
+    popup2.style.display = "none";
+};
+
+popup2.onclick = function(e) {
+    if (e.target == popup2) {
+        var video = popup2.getElementsByTagName("video")[0];
+        if (video) {
+            video.pause();
+            video.currentTime = 0;
+        }
+        popup2.style.display = "none";
+    }
+};
+
+// =======================
+// POPUPS VICTORIA / DERROTA
+// =======================
+var popupVictoria = document.getElementById("popupVictoria");
+var popupDerrota = document.getElementById("popupDerrota");
+
+var cerrarVictoria = document.getElementById("cerrarVictoria");
+var cerrarDerrota = document.getElementById("cerrarDerrota");
+
+var mensajeVictoria = document.getElementById("mensajeVictoria");
+var mensajeDerrota = document.getElementById("mensajeDerrota");
+
+// 🔊 AUDIOS
+var audioVictoria = document.getElementById("audioVictoria");
+var audioDerrota = document.getElementById("audioDerrota");
+
+cerrarVictoria.onclick = function() {
+    popupVictoria.style.display = "none";
+    if (audioVictoria) {
+        audioVictoria.pause();
+        audioVictoria.currentTime = 0;
+    }
+};
+
+cerrarDerrota.onclick = function() {
+    popupDerrota.style.display = "none";
+    if (audioDerrota) {
+        audioDerrota.pause();
+        audioDerrota.currentTime = 0;
+    }
+};
+
+popupVictoria.onclick = function(e) {
+    if (e.target == popupVictoria) {
+        popupVictoria.style.display = "none";
+        if (audioVictoria) {
+            audioVictoria.pause();
+            audioVictoria.currentTime = 0;
+        }
+    }
+};
+
+popupDerrota.onclick = function(e) {
+    if (e.target == popupDerrota) {
+        popupDerrota.style.display = "none";
+        if (audioDerrota) {
+            audioDerrota.pause();
+            audioDerrota.currentTime = 0;
+        }
+    }
+};
 
 // =======================
 // JUEGO
 // =======================
-const botones = document.querySelectorAll('.boton');
-const recuadros = document.querySelectorAll('.recuadro-pin');
-const displayIntentos = document.getElementById('intentos');
-const displayTimer = document.getElementById('timer');
+var recuadros = document.getElementsByClassName("recuadro-pin");
+var displayIntentos = document.getElementById("intentos");
+var displayTimer = document.getElementById("timer");
 
-const botonStart = botones[12];
-const botonStop = botones[13];
-const botonReset = botones[14];
+var botonStart = botones[12];
+var botonStop = botones[13];
+var botonReset = botones[14];
 
-let intentos = 7;
-let juegoActivo = false;
-let tiempo = 0;
-let intervalo = null;
+var intentosIniciales = parseInt(displayIntentos.textContent);
+if (isNaN(intentosIniciales)) intentosIniciales = 7;
 
-let PIN = [];
-let progreso = ["", "", "", ""];
+var intentos = intentosIniciales;
+
+var juegoActivo = false;
+var tiempo = 0;
+var intervalo = null;
+
+var PIN = [];
+var progreso = ["", "", "", ""];
 
 // =======================
-// GENERAR PIN RANDOM
+// GENERAR PIN SIN REPETIDOS
 // =======================
-function generarPIN(){
-    let nums = [];
-    while(nums.length < 4){
-        let n = Math.floor(Math.random() * 10).toString();
-        if(!nums.includes(n)){
+function generarPIN() {
+
+    var nums = [];
+
+    while (nums.length < 4) {
+
+        var n = Math.floor(Math.random() * 10).toString();
+        var repetido = false;
+
+        for (var i = 0; i < nums.length; i++) {
+            if (nums[i] == n) {
+                repetido = true;
+                break;
+            }
+        }
+
+        if (repetido == false) {
             nums.push(n);
         }
     }
+
     return nums;
 }
 
 // =======================
-// TIMER (mm:ss:ms)
+// TIMER
 // =======================
-function actualizarTimer(){
-    tiempo += 10;
+function actualizarTimer() {
+    tiempo = tiempo + 10;
 
-    let minutos = String(Math.floor(tiempo / 60000)).padStart(2, '0');
-    let segundos = String(Math.floor((tiempo % 60000) / 1000)).padStart(2, '0');
-    let miliseg = String(Math.floor((tiempo % 1000) / 10)).padStart(2, '0');
+    var minutos = Math.floor(tiempo / 60000);
+    var segundos = Math.floor((tiempo % 60000) / 1000);
+    var miliseg = Math.floor((tiempo % 1000) / 10);
 
-    displayTimer.textContent = `${minutos}:${segundos}:${miliseg}`;
+    if (minutos < 10) minutos = "0" + minutos;
+    if (segundos < 10) segundos = "0" + segundos;
+    if (miliseg < 10) miliseg = "0" + miliseg;
+
+    displayTimer.textContent = minutos + ":" + segundos + ":" + miliseg;
 }
 
 // =======================
 // START
 // =======================
-botonStart.addEventListener('click', () => {
-    if(juegoActivo) return;
+if (botonStart) {
+    botonStart.onclick = function() {
+        if (juegoActivo == true) return;
 
-    juegoActivo = true;
-    intervalo = setInterval(actualizarTimer, 10);
-});
+        juegoActivo = true;
+        intervalo = setInterval(actualizarTimer, 10);
+    };
+}
 
 // =======================
 // STOP
 // =======================
-botonStop.addEventListener('click', () => {
-    clearInterval(intervalo);
-    juegoActivo = false;
-});
+if (botonStop) {
+    botonStop.onclick = function() {
+        clearInterval(intervalo);
+        juegoActivo = false;
+    };
+}
 
 // =======================
 // RESET
 // =======================
-botonReset.addEventListener('click', () => {
-    clearInterval(intervalo);
+if (botonReset) {
+    botonReset.onclick = function() {
+        clearInterval(intervalo);
 
-    juegoActivo = false;
-    tiempo = 0;
-    intentos = 7;
+        juegoActivo = false;
+        tiempo = 0;
+        intentos = intentosIniciales;
 
-    PIN = generarPIN();
-    progreso = ["", "", "", ""];
+        PIN = generarPIN();
+        progreso = ["", "", "", ""];
 
-    displayTimer.textContent = "00:00:00";
-    displayIntentos.textContent = intentos;
+        displayTimer.textContent = "00:00:00";
+        displayIntentos.textContent = intentos;
 
-    recuadros.forEach(r => {
-        r.value = "";
-        r.style.background = "";
-    });
+        for (var i = 0; i < recuadros.length; i++) {
+            recuadros[i].value = "";
+            recuadros[i].style.background = "";
+        }
 
-    botones.forEach(b => {
-        b.disabled = false;
-        b.style.opacity = "1";
-        b.style.background = "";
-    });
-});
+        for (var i = 0; i < botones.length; i++) {
+            botones[i].disabled = false;
+            botones[i].style.opacity = "1";
+            botones[i].style.background = "";
+        }
+    };
+}
 
 // =======================
-// INICIALIZAR PRIMER PIN
+// INICIALIZAR PIN
 // =======================
 PIN = generarPIN();
 
 // =======================
-// CLICK BOTONES
+// BOTONES NUMERICOS
 // =======================
-botones.forEach(boton => {
-    boton.addEventListener('click', () => {
+for (var i = 0; i < botones.length; i++) {
 
-        const valor = boton.textContent;
+    botones[i].addEventListener("click", function() {
 
-        // SOLO NUMEROS
-        if(!/^\d$/.test(valor)) return;
+        var valor = this.textContent;
 
-        if(!juegoActivo) return;
-        if(boton.disabled) return;
+        if (!/^\d$/.test(valor)) return;
+        if (juegoActivo == false) return;
+        if (this.disabled == true) return;
 
-        // RESTAR INTENTO
-        intentos--;
+        intentos = intentos - 1;
         displayIntentos.textContent = intentos;
 
-        let acierto = false;
+        var acierto = false;
 
-        // COMPROBAR PIN
-        PIN.forEach((num, i) => {
-            if(num === valor){
-                progreso[i] = valor;
-                recuadros[i].value = valor;
-                recuadros[i].style.background = "lightgreen";
+        for (var j = 0; j < PIN.length; j++) {
+            if (PIN[j] == valor) {
+                progreso[j] = valor;
+                recuadros[j].value = valor;
+                recuadros[j].style.background = "lightgreen";
                 acierto = true;
             }
-        });
-
-        // COLOR BOTON
-        if(acierto){
-            boton.style.background = "green";
-        }else{
-            boton.style.background = "red";
         }
 
-        boton.disabled = true;
-        boton.style.opacity = "0.5";
+        if (acierto == true) {
+            this.style.background = "green";
+        } else {
+            this.style.background = "red";
+        }
+
+        this.disabled = true;
+        this.style.opacity = "0.5";
 
         // VICTORIA
-        if(progreso.join('') === PIN.join('')){
+        if (progreso.join("") == PIN.join("")) {
+
             clearInterval(intervalo);
             juegoActivo = false;
 
-            alert(`🎉 ¡Victoria!\n⏱ Tiempo: ${displayTimer.textContent}\n🔐 PIN: ${PIN.join('')}`);
+            mensajeVictoria.textContent =
+                "⏱ Tiempo: " + displayTimer.textContent +
+                " | 🔐 PIN: " + PIN.join("");
+
+            popupVictoria.style.display = "flex";
+
+            if (audioVictoria) {
+                audioVictoria.play();
+            }
+
         }
-
         // DERROTA
-        if(intentos <= 0){
+        else if (intentos <= 0) {
+
             clearInterval(intervalo);
             juegoActivo = false;
 
-            alert(`💀 Derrota\n⏱ Tiempo: ${displayTimer.textContent}\n🔐 PIN correcto: ${PIN.join('')}`);
+            mensajeDerrota.textContent =
+                "⏱ Tiempo: " + displayTimer.textContent +
+                " | 🔐 PIN correcto: " + PIN.join("");
+
+            popupDerrota.style.display = "flex";
+
+            if (audioDerrota) {
+                audioDerrota.play();
+            }
         }
 
     });
-});
+}
