@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+}
+
+h1 {
+  margin: 10px;
+}
+
+/* Contenedor responsive */
+.game-container {
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+}
+
+/* Canvas adaptable */
+canvas {
+  width: 100%;
+  height: auto;
+  background: black;
+  border: 2px solid white;
+  display: block;
+}
+
+/* Controles táctiles */
+.controls {
+  display: none;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.controls button {
+  flex: 1;
+  margin: 5px;
+  padding: 15px;
+  font-size: 20px;
+  border: none;
+  border-radius: 10px;
+}
+
+/* Activar controles en móvil */
+@media (max-width: 768px) {
+  .controls {
+    display: flex;
+  }
+}

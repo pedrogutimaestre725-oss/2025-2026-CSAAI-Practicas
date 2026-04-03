@@ -4,4 +4,6 @@ Mis prácticas de la asignatura Construcción de Servicios y Aplicaciones Audiov
 - [Práctica 1 (CV)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P1/CV/index.html)
 - [Práctica 2 (¡Boom!)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P2/Boom/index.html)
 
+- [Práctica 3 (Space Invaders)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P3/AI/index.html)
+
 URJC Profe
