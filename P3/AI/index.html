@@ -2,8 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+
+  <!-- Responsive -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Invasión Alienígena</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- JS estilo profe -->
+  <script src="game.js" defer></script>
 </head>
 <body>
 
@@ -12,14 +20,12 @@
 <div class="game-container">
   <canvas id="gameCanvas"></canvas>
 
-  <!-- Controles móvil -->
   <div class="controls">
-    <button id="left">⬅️</button>
-    <button id="shoot">🔥</button>
-    <button id="right">➡️</button>
+    <button id="btnLeft">⬅️</button>
+    <button id="btnShoot">🔥</button>
+    <button id="btnRight">➡️</button>
   </div>
 </div>
 
-<script src="game.js"></script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+// --- CANVAS ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -10,25 +11,29 @@ const explosionSound = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-ex
 
 // --- INPUT ---
 const keys = {};
-document.addEventListener("keydown", e => keys[e.code] = true);
-document.addEventListener("keyup", e => keys[e.code] = false);
 
-// MOBILE
-document.getElementById("left").ontouchstart = () => keys["ArrowLeft"] = true;
-document.getElementById("left").ontouchend = () => keys["ArrowLeft"] = false;
+document.addEventListener("keydown", function(e) {
+  keys[e.code] = true;
+});
 
-document.getElementById("right").ontouchstart = () => keys["ArrowRight"] = true;
-document.getElementById("right").ontouchend = () => keys["ArrowRight"] = false;
+document.addEventListener("keyup", function(e) {
+  keys[e.code] = false;
+});
 
-document.getElementById("shoot").ontouchstart = () => keys["Space"] = true;
-document.getElementById("shoot").ontouchend = () => keys["Space"] = false;
+// --- CONTROLES MÓVIL ---
+document.getElementById("btnLeft").ontouchstart = function() { keys["ArrowLeft"] = true; };
+document.getElementById("btnLeft").ontouchend = function() { keys["ArrowLeft"] = false; };
+
+document.getElementById("btnRight").ontouchstart = function() { keys["ArrowRight"] = true; };
+document.getElementById("btnRight").ontouchend = function() { keys["ArrowRight"] = false; };
+
+document.getElementById("btnShoot").ontouchstart = function() { keys["Space"] = true; };
+document.getElementById("btnShoot").ontouchend = function() { keys["Space"] = false; };
 
 // --- PLAYER ---
 const player = {
   x: 300,
   y: 550,
-  width: 30,
-  height: 20,
   speed: 5,
   lives: 3,
 
@@ -36,10 +41,13 @@ const player = {
   maxHeat: 100,
   overheated: false,
 
+  heatPerShot: 18,
+  coolRate: 0.35,
+
   shootDelay: 0
 };
 
-// --- STATE ---
+// --- ESTADO ---
 let bullets = [];
 let enemyBullets = [];
 let explosions = [];
@@ -50,8 +58,9 @@ let win = false;
 let startTime = Date.now();
 let finalTime = 0;
 
-// --- ENEMIES ---
+// --- ENEMIGOS ---
 let enemies = [];
+
 for (let r = 0; r < 3; r++) {
   for (let c = 0; c < 8; c++) {
     enemies.push({
@@ -62,77 +71,119 @@ for (let r = 0; r < 3; r++) {
   }
 }
 
-let dir = 1;
+let direction = 1;
 
 // --- UPDATE ---
 function update() {
+
   if (gameOver) return;
 
   // Movimiento
   if (keys["ArrowLeft"]) player.x -= player.speed;
   if (keys["ArrowRight"]) player.x += player.speed;
-  player.x = Math.max(0, Math.min(570, player.x));
 
-  // --- DISPARO BALANCEADO ---
+  if (player.x < 0) player.x = 0;
+  if (player.x > 570) player.x = 570;
+
+  // Disparo
   if (keys["Space"] && !player.overheated && player.shootDelay <= 0) {
+
     bullets.push({ x: player.x + 13, y: player.y });
 
-    player.heat += 5; // sube más lento
-    player.shootDelay = 15; // cadencia (~0.25s)
+    player.heat += player.heatPerShot;
+    player.shootDelay = 18;
 
     shootSound.currentTime = 0;
     shootSound.play();
 
     if (player.heat >= player.maxHeat) {
+      player.heat = player.maxHeat;
       player.overheated = true;
     }
   }
 
   player.shootDelay--;
 
-  // --- ENFRIAMIENTO MÁS RÁPIDO ---
-  player.heat -= 1; // enfría más rápido
+  // Enfriamiento
+  player.heat -= player.coolRate;
   if (player.heat < 0) player.heat = 0;
 
-  if (player.overheated && player.heat <= 30) {
+  if (player.overheated && player.heat <= player.maxHeat * 0.25) {
     player.overheated = false;
   }
 
-  // Balas
-  bullets.forEach(b => b.y -= 6);
-  enemyBullets.forEach(b => b.y += 4);
+  // --- BALAS ---
+  for (let i = 0; i < bullets.length; i++) {
+    bullets[i].y -= 6;
+  }
 
-  bullets = bullets.filter(b => b.y > 0);
-  enemyBullets = enemyBullets.filter(b => b.y < 600);
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    if (bullets[i].y <= 0) {
+      bullets.splice(i, 1);
+    }
+  }
 
-  // --- VELOCIDAD PROGRESIVA ---
-  let alive = enemies.filter(e => e.alive);
+  // --- BALAS ENEMIGAS ---
+  for (let i = 0; i < enemyBullets.length; i++) {
+    enemyBullets[i].y += 4;
+  }
+
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    if (enemyBullets[i].y >= 600) {
+      enemyBullets.splice(i, 1);
+    }
+  }
+
+  // --- ENEMIGOS ---
+  let alive = [];
+  for (let i = 0; i < enemies.length; i++) {
+    if (enemies[i].alive) alive.push(enemies[i]);
+  }
+
   let factor = (24 - alive.length) / 24;
-
   let speed = 0.5 + factor * 2.5;
 
   let moveDown = false;
-  enemies.forEach(e => {
-    if (!e.alive) return;
-    e.x += dir * speed;
 
-    if (e.x < 10 || e.x > 560) moveDown = true;
-  });
+  for (let i = 0; i < enemies.length; i++) {
+    let e = enemies[i];
 
-  if (moveDown) {
-    dir *= -1;
-    enemies.forEach(e => e.y += 20);
+    if (!e.alive) continue;
+
+    e.x += direction * speed;
+
+    if (e.x < 10 || e.x > 560) {
+      moveDown = true;
+    }
   }
 
-  // --- DISPARO ENEMIGO NERFEADO ---
-  if (Math.random() < 0.01 + factor * 0.02 && alive.length) {
-    let shooter = alive[Math.floor(Math.random() * alive.length)];
-    enemyBullets.push({ x: shooter.x + 15, y: shooter.y });
+  if (moveDown) {
+    direction *= -1;
+    for (let i = 0; i < enemies.length; i++) {
+      enemies[i].y += 20;
+    }
+  }
+
+  // Disparo enemigo
+  let probDisparo = 0.01 + factor * 0.02;
+
+  if (Math.random() < probDisparo && alive.length > 0) {
+    let index = Math.floor(Math.random() * alive.length);
+    let shooter = alive[index];
+
+    enemyBullets.push({
+      x: shooter.x + 15,
+      y: shooter.y
+    });
   }
 
   // Colisiones
-  bullets.forEach(b => {
-    enemies.forEach(e => {
+  for (let i = 0; i < bullets.length; i++) {
+    let b = bullets[i];
+
+    for (let j = 0; j < enemies.length; j++) {
+      let e = enemies[j];
+
       if (e.alive &&
         b.x < e.x + 30 &&
         b.x > e.x &&
@@ -144,13 +195,17 @@ function update() {
         score += 10;
 
         explosions.push({ x: e.x, y: e.y, frame: 0 });
+
         explosionSound.currentTime = 0;
         explosionSound.play();
       }
-    });
-  });
+    }
+  }
 
-  enemyBullets.forEach(b => {
+  // Impacto jugador
+  for (let i = 0; i < enemyBullets.length; i++) {
+    let b = enemyBullets[i];
+
     if (
       b.x > player.x &&
       b.x < player.x + 30 &&
@@ -159,22 +214,32 @@ function update() {
     ) {
       player.lives--;
       b.y = 700;
+
       if (player.lives <= 0) {
         gameOver = true;
         finalTime = Date.now() - startTime;
       }
     }
-  });
+  }
 
-  explosions.forEach(e => e.frame++);
-  explosions = explosions.filter(e => e.frame < 15);
+  // Explosiones
+  for (let i = 0; i < explosions.length; i++) {
+    explosions[i].frame++;
+  }
 
-  enemies.forEach(e => {
-    if (e.alive && e.y > player.y) {
+  for (let i = explosions.length - 1; i >= 0; i--) {
+    if (explosions[i].frame >= 15) {
+      explosions.splice(i, 1);
+    }
+  }
+
+  // Fin
+  for (let i = 0; i < enemies.length; i++) {
+    if (enemies[i].alive && enemies[i].y > player.y) {
       gameOver = true;
       finalTime = Date.now() - startTime;
     }
-  });
+  }
 
   if (alive.length === 0) {
     win = true;
@@ -183,36 +248,35 @@ function update() {
   }
 }
 
-// --- FORMATO TIEMPO ---
+// --- TIEMPO ---
 function formatTime(ms) {
-  let minutes = Math.floor(ms / 60000);
-  let seconds = Math.floor((ms % 60000) / 1000);
-  let millis = Math.floor((ms % 1000) / 10);
+  let m = Math.floor(ms / 60000);
+  let s = Math.floor((ms % 60000) / 1000);
+  let ms2 = Math.floor((ms % 1000) / 10);
 
-  return `${minutes}:${seconds.toString().padStart(2, "0")}:${millis.toString().padStart(2, "0")}`;
+  if (s < 10) s = "0" + s;
+  if (ms2 < 10) ms2 = "0" + ms2;
+
+  return m + ":" + s + ":" + ms2;
 }
 
 // --- DRAW ---
 function draw() {
   ctx.clearRect(0, 0, 600, 600);
 
-  // TIEMPO CONGELADO
-  let currentTime = gameOver ? finalTime : Date.now() - startTime;
+  let time = gameOver ? finalTime : Date.now() - startTime;
 
   ctx.fillStyle = "white";
   ctx.fillText("Score: " + score, 10, 20);
   ctx.fillText("Lives: " + player.lives, 10, 40);
-  ctx.fillText(formatTime(currentTime), 470, 20);
+  ctx.fillText(formatTime(time), 470, 20);
 
-  // BARRA CALOR
-  let barWidth = 150;
-  let heatRatio = player.heat / player.maxHeat;
+  // Barra calor
+  let ratio = player.heat / player.maxHeat;
 
-  ctx.strokeStyle = "white";
-  ctx.strokeRect(220, 10, barWidth, 10);
-
+  ctx.strokeRect(220, 10, 150, 10);
   ctx.fillStyle = player.overheated ? "red" : "orange";
-  ctx.fillRect(220, 10, barWidth * heatRatio, 10);
+  ctx.fillRect(220, 10, 150 * ratio, 10);
 
   // Player
   ctx.fillStyle = player.overheated ? "red" : "cyan";
@@ -224,44 +288,51 @@ function draw() {
 
   // Balas
   ctx.fillStyle = "yellow";
-  bullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 10));
+  for (let i = 0; i < bullets.length; i++) {
+    let b = bullets[i];
+    ctx.fillRect(b.x, b.y, 4, 10);
+  }
 
+  // Balas enemigas
   ctx.fillStyle = "red";
-  enemyBullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 10));
+  for (let i = 0; i < enemyBullets.length; i++) {
+    let b = enemyBullets[i];
+    ctx.fillRect(b.x, b.y, 4, 10);
+  }
 
   // Enemigos
-  enemies.forEach(e => {
-    if (!e.alive) return;
+  for (let i = 0; i < enemies.length; i++) {
+    let e = enemies[i];
+
+    if (!e.alive) continue;
 
     ctx.fillStyle = "lime";
     ctx.fillRect(e.x, e.y, 30, 20);
-
-    ctx.fillStyle = "black";
-    ctx.fillRect(e.x + 5, e.y + 5, 5, 5);
-    ctx.fillRect(e.x + 20, e.y + 5, 5, 5);
-  });
+  }
 
   // Explosiones
-  explosions.forEach(e => {
-    ctx.fillStyle = `rgba(255,165,0,${1 - e.frame/15})`;
+  for (let i = 0; i < explosions.length; i++) {
+    let e = explosions[i];
+
+    ctx.fillStyle = "rgba(255,165,0," + (1 - e.frame / 15) + ")";
     ctx.beginPath();
     ctx.arc(e.x + 15, e.y + 10, e.frame * 2, 0, Math.PI * 2);
     ctx.fill();
-  });
+  }
 
-  // FIN
+  // Fin
   if (gameOver) {
-    ctx.fillStyle = "white";
     ctx.font = "30px Arial";
+    ctx.fillStyle = "white";
     ctx.fillText(win ? "VICTORIA" : "GAME OVER", 180, 300);
   }
 }
 
 // --- LOOP ---
-function loop() {
+function gameLoop() {
   update();
   draw();
-  requestAnimationFrame(loop);
+  requestAnimationFrame(gameLoop);
 }
 
-loop();
+gameLoop();
