@@ -6,8 +6,12 @@ body {
   font-family: Arial;
 }
 
+.title {
+  margin: 10px 0;
+}
+
 .game-container {
-  width: 100%;
+  width: 95%;
   max-width: 600px;
   margin: auto;
 }
@@ -15,6 +19,7 @@ body {
 canvas {
   width: 100%;
   height: auto;
+  max-height: 80vh;
   border: 2px solid white;
   background: black;
 }
@@ -28,9 +33,12 @@ canvas {
 .controls button {
   flex: 1;
   margin: 5px;
-  padding: 15px;
-  font-size: 20px;
-  border-radius: 10px;
+  padding: 18px;
+  font-size: 22px;
+  border-radius: 12px;
+  border: none;
+  background: #222;
+  color: white;
 }
 
 @media (max-width: 768px) {
