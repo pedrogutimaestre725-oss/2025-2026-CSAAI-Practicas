@@ -1,11 +1,15 @@
 body {
   margin: 0;
-  background: black;
+  background: url("fondo.png") no-repeat center center fixed;
+  background-size: cover;
   color: white;
   text-align: center;
   font-family: Arial;
 }
 
+h1 {
+  color: #ff8c00; /* naranja baloncesto */
+}
 .title {
   margin: 10px 0;
 }

@@ -1,3 +1,4 @@
+
 // --- CANVAS ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -28,6 +29,15 @@ activar("btnLeft", "ArrowLeft");
 activar("btnRight", "ArrowRight");
 activar("btnShoot", "Space");
 
+// Reproducir bgMusic al primer toque o tecla
+document.addEventListener("keydown", () => {
+  bgMusic.play();
+}, { once: true });
+
+document.addEventListener("touchstart", () => {
+  bgMusic.play();
+}, { once: true });
+
 // --- IMÁGENES ---
 const playerImg = new Image();
 playerImg.src = "Curry.jpg";
@@ -41,16 +51,30 @@ bulletImg.src = "Ball.png";
 const lifeImg = new Image();
 lifeImg.src = "life.png";
 
+const alienImgs = [
+  "suns.png","bulls.png","gsw.png","spurs.png",
+  "miami.png","lakers.jpeg","celtics.jpeg","knicks.jpeg"
+].map(src => {
+  let img = new Image();
+  img.src = src;
+  return img;
+});
+
 // --- SONIDOS ---
-const shootSound = new Audio("shoot.wav");
-const explosionSound = new Audio("explosion.wav");
-const winSound = new Audio("win.wav");
-const loseSound = new Audio("lose.wav");
+const bgMusic = new Audio("fondo.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.4;
+const shootSound = new Audio("ray.mp3");
+const explosionSound = new Audio("explosion.mp3");
+const winSound = new Audio("Win.mp3");
+const loseSound = new Audio("Boom.mp3");
 
 // --- PLAYER ---
 const player = {
   x: 300,
   y: 640,
+  width: 60,
+  height: 45,
   speed: 5,
   lives: 3,
 
@@ -69,6 +93,7 @@ const player = {
 let bullets = [];
 let enemyBullets = [];
 let explosions = [];
+let endParticles = [];
 
 let score = 0;
 let gameOver = false;
@@ -76,20 +101,12 @@ let win = false;
 
 let startTime = Date.now();
 let finalTime = 0;
+let endAnim = 0;
 
 // --- ENEMIGOS ---
 let enemies = [];
 
 function crearEnemigos() {
-  const imgs = [
-    "suns.png","bulls.png","gsw.png","spurs.png",
-    "miami.png","lakers.jpeg","celtics.jpeg","knicks.jpeg"
-  ].map(src => {
-    let img = new Image();
-    img.src = src;
-    return img;
-  });
-
   enemies = [];
 
   for (let r = 0; r < 3; r++) {
@@ -98,7 +115,7 @@ function crearEnemigos() {
     for (let c = 0; c < 8; c++) {
       let index;
       do {
-        index = Math.floor(Math.random() * imgs.length);
+        index = Math.floor(Math.random() * alienImgs.length);
       } while (usados.includes(index));
 
       usados.push(index);
@@ -109,7 +126,7 @@ function crearEnemigos() {
         width: 45,
         height: 45,
         alive: true,
-        img: imgs[index]
+        img: alienImgs[index]
       });
     }
   }
@@ -121,29 +138,38 @@ let direction = 1;
 // --- UPDATE ---
 function update() {
 
-  if (gameOver) return;
+  if (gameOver) {
+    if (endAnim < 60) endAnim++;
+
+    // partículas finales
+    endParticles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life--;
+    });
+
+    endParticles = endParticles.filter(p => p.life > 0);
+
+    return;
+  }
 
   if (keys["ArrowLeft"]) player.x -= player.speed;
   if (keys["ArrowRight"]) player.x += player.speed;
 
   player.x = Math.max(0, Math.min(560, player.x));
 
-  // DISPARO
+  // DISPARO PLAYER
   if (keys["Space"] && !player.overheated && player.shootDelay <= 0) {
-
     bullets.push({ x: player.x + 13, y: player.y });
 
     player.heat += player.heatPerShot;
     player.shootDelay = 20;
-
     player.shootAnim = 10;
 
     shootSound.currentTime = 0;
     shootSound.play();
 
-    if (player.heat >= player.maxHeat) {
-      player.overheated = true;
-    }
+    if (player.heat >= player.maxHeat) player.overheated = true;
   }
 
   player.shootDelay--;
@@ -157,11 +183,11 @@ function update() {
     player.overheated = false;
   }
 
-  // BALAS
+  // BALAS PLAYER
   bullets.forEach(b => b.y -= 6);
   bullets = bullets.filter(b => b.y > 0);
 
-  // ENEMIGOS
+  // --- ENEMIGOS ---
   let alive = enemies.filter(e => e.alive);
   let factor = (24 - alive.length) / 24;
   let speed = 0.3 + factor * 1.8;
@@ -181,20 +207,26 @@ function update() {
   }
 
   // DISPARO ENEMIGO
-  if (Math.random() < 0.01 + factor * 0.02 && alive.length > 0) {
+  let prob = 0.01 + factor * 0.02;
+
+  if (Math.random() < prob && alive.length > 0) {
     let shooter = alive[Math.floor(Math.random() * alive.length)];
-    enemyBullets.push({ x: shooter.x + 20, y: shooter.y });
+    enemyBullets.push({
+      x: shooter.x + 20,
+      y: shooter.y
+    });
   }
 
   enemyBullets.forEach(b => b.y += 4);
+  enemyBullets = enemyBullets.filter(b => b.y < 700);
 
   // COLISION PLAYER
   enemyBullets.forEach(b => {
     if (
       b.x > player.x &&
-      b.x < player.x + 40 &&
+      b.x < player.x + 60 &&
       b.y > player.y &&
-      b.y < player.y + 30
+      b.y < player.y + 45
     ) {
       player.lives--;
       b.y = 800;
@@ -202,7 +234,11 @@ function update() {
       if (player.lives <= 0) {
         gameOver = true;
         finalTime = Date.now() - startTime;
+        
+        loseSound.currentTime = 0;
         loseSound.play();
+        bgMusic.pause();
+        crearParticulasFinal(false);
       }
     }
   });
@@ -223,7 +259,8 @@ function update() {
         explosionSound.currentTime = 0;
         explosionSound.play();
 
-        for (let i = 0; i < 20; i++) {
+        // 💥 EXPLOSIÓN PRO
+        for (let i = 0; i < 25; i++) {
           explosions.push({
             x: e.x + 20,
             y: e.y + 20,
@@ -236,7 +273,6 @@ function update() {
     });
   });
 
-  // PARTICULAS
   explosions.forEach(p => {
     p.x += p.vx;
     p.y += p.vy;
@@ -250,7 +286,8 @@ function update() {
     if (e.alive && e.y + e.height >= player.y) {
       gameOver = true;
       finalTime = Date.now() - startTime;
-      loseSound.play();
+
+      crearParticulasFinal(false);
     }
   });
 
@@ -258,7 +295,27 @@ function update() {
     win = true;
     gameOver = true;
     finalTime = Date.now() - startTime;
+
+    winSound.currentTime = 0;
     winSound.play();
+    bgMusic.pause();
+    crearParticulasFinal(true);
+  }
+}
+
+// 🎉 PARTÍCULAS FINAL
+function crearParticulasFinal(victoria) {
+  for (let i = 0; i < 80; i++) {
+    endParticles.push({
+      x: 300,
+      y: 350,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      life: 60,
+      color: victoria
+        ? `hsl(${Math.random()*360},100%,50%)`
+        : `rgba(255,80,0,0.8)`
+    });
   }
 }
 
@@ -267,14 +324,13 @@ function formatTime(ms) {
   let m = Math.floor(ms / 60000);
   let s = Math.floor((ms % 60000) / 1000);
   let ms2 = Math.floor((ms % 1000) / 10);
-
   return `${m}:${s.toString().padStart(2,'0')}:${ms2.toString().padStart(2,'0')}`;
 }
 
 // --- DRAW ---
 function draw() {
 
-  ctx.fillStyle = "#111";
+  ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, 600, 700);
 
   let time = gameOver ? finalTime : Date.now() - startTime;
@@ -287,47 +343,64 @@ function draw() {
   ctx.textAlign = "right";
   ctx.fillText(formatTime(time), 590, 20);
 
+  ctx.textAlign = "left";
+  ctx.fillText("Lives:", 10, 50);
+
   // VIDAS
   for (let i = 0; i < player.lives; i++) {
-    ctx.drawImage(lifeImg, 10 + i * 25, 30, 20, 20);
+    ctx.fillStyle = "#111";
+    ctx.fillRect(70 + i * 25, 35, 20, 20);
+    ctx.drawImage(lifeImg, 70 + i * 25, 35, 20, 20);
   }
 
-  // 🔥 BARRA CALOR (CÍRCULOS REALES)
+  // BARRA CALOR
   let balls = 10;
   let ratio = player.heat / player.maxHeat;
 
   for (let i = 0; i < balls; i++) {
     let x = 200 + i * 18;
-    let y = 10;
-
     let active = i < ratio * balls;
 
-    ctx.save();
-
-    ctx.beginPath();
-    ctx.arc(x + 7, y + 7, 7, 0, Math.PI * 2);
-    ctx.clip();
-
     ctx.globalAlpha = active ? 1 : 0.2;
-    ctx.drawImage(bulletImg, x, y, 14, 14);
+    ctx.drawImage(bulletImg, x, 10, 14, 14);
 
     if (player.overheated && active) {
       ctx.globalCompositeOperation = "source-atop";
       ctx.fillStyle = "red";
-      ctx.fillRect(x, y, 14, 14);
+      ctx.beginPath();
+      ctx.arc(x + 7, 17, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = "source-over";
     }
 
-    ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
-  // PLAYER (ANIMACIÓN CORRECTA)
+  // PLAYER
   let img = (keys["Space"] || player.shootAnim > 0) ? shootImg : playerImg;
-  ctx.drawImage(img, player.x, player.y, 40, 30);
+  ctx.save();
 
-  // BALAS
+  ctx.shadowColor = "black";
+  ctx.shadowBlur = 15;
+
+  ctx.beginPath();
+  ctx.roundRect(player.x, player.y, player.width, player.height, 12);
+  ctx.fillStyle = "white";
+  ctx.fill();
+  ctx.clip();
+
+  ctx.drawImage(img, player.x, player.y, player.width, player.height);
+
+  ctx.restore();
+
+  // BALAS PLAYER
   bullets.forEach(b => ctx.drawImage(bulletImg, b.x, b.y, 12, 12));
 
-  // ENEMIGOS
+  // BALAS ENEMIGAS
+  ctx.fillStyle = "red";
+  enemyBullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 10));
+
+  // ALIENS
   enemies.forEach(e => {
     if (!e.alive) return;
 
@@ -353,15 +426,28 @@ function draw() {
     ctx.fill();
   });
 
-  // FIN
+  // FINAL
   if (gameOver) {
-    ctx.fillStyle = "rgba(0,0,0,0.8)";
+    ctx.fillStyle = `rgba(0,0,0,${endAnim/80})`;
     ctx.fillRect(0, 0, 600, 700);
 
     ctx.textAlign = "center";
-    ctx.font = "30px Arial";
+    ctx.font = "40px Arial";
+    ctx.fillStyle = win ? "lime" : "red";
+    ctx.fillText(win ? "VICTORIA" : "GAME OVER", 300, 320);
+
+    ctx.font = "18px Arial";
     ctx.fillStyle = "white";
-    ctx.fillText(win ? "VICTORIA" : "GAME OVER", 300, 350);
+    ctx.fillText("Score: " + score, 300, 360);
+    ctx.fillText("Time: " + formatTime(finalTime), 300, 385);
+
+    // partículas finales
+    endParticles.forEach(p => {
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 }
 
@@ -373,3 +459,4 @@ function gameLoop() {
 }
 
 gameLoop();
+bgMusic.play();
