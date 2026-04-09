@@ -153,13 +153,13 @@ function update() {
     return;
   }
 
-  if (keys["ArrowLeft"]) player.x -= player.speed;
-  if (keys["ArrowRight"]) player.x += player.speed;
+  if (keys.ArrowLeft) player.x -= player.speed;
+  if (keys.ArrowRight) player.x += player.speed;
 
   player.x = Math.max(0, Math.min(560, player.x));
 
   // DISPARO PLAYER
-  if (keys["Space"] && !player.overheated && player.shootDelay <= 0) {
+  if (keys.Space && !player.overheated && player.shootDelay <= 0) {
     bullets.push({ x: player.x + 13, y: player.y });
 
     player.heat += player.heatPerShot;
@@ -312,9 +312,7 @@ function crearParticulasFinal(victoria) {
       vx: (Math.random() - 0.5) * 6,
       vy: (Math.random() - 0.5) * 6,
       life: 60,
-      color: victoria
-        ? `hsl(${Math.random()*360},100%,50%)`
-        : `rgba(255,80,0,0.8)`
+      color: victoria ? `hsl(${Math.random()*360},100%,50%)` : `rgba(255,80,0,0.8)`
     });
   }
 }
@@ -377,7 +375,7 @@ function draw() {
   }
 
   // PLAYER
-  let img = (keys["Space"] || player.shootAnim > 0) ? shootImg : playerImg;
+  let img = (keys.Space || player.shootAnim > 0) ? shootImg : playerImg;
   ctx.save();
 
   ctx.shadowColor = "black";
