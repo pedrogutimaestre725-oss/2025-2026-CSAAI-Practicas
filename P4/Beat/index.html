@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Beat The Word</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>🎵 Beat The Word</h1>
+  <div class="status">
+    <span>Nivel: <b id="nivel">1</b>/5</span>
+    <span>Tiempo: <b id="tiempo">0.0</b>s</span>
+    <span>Estado: <b id="estado">En espera</b></span>
+  </div>
+</header>
+
+<main>
+
+  <aside class="panel">
+    <h3>⚙️ Configuración</h3>
+
+    <label>Secuencia</label>
+    <select id="wordSet">
+      <option value="casa">Casa / Cama</option>
+      <option value="gato">Gato / Pato</option>
+    </select>
+
+    <label>Nivel inicial</label>
+    <select id="startLevel">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+
+    <label><input type="checkbox" id="showText" checked> Mostrar texto</label>
+    <label><input type="checkbox" id="voiceMode"> Activar voz</label>
+
+    <button id="startBtn">▶ Empezar</button>
+    <button id="stopBtn">⛔ Detener</button>
+    <button id="recordBtn">🎤 Grabar</button>
+  </aside>
+
+  <section class="game">
+    <div class="game-header">
+      <span id="gameLevel">1/5</span>
+      <button id="musicBtn">🔊 Música ON</button>
+    </div>
+
+    <div id="message">Pulsa "Empezar"</div>
+
+    <div class="grid" id="grid"></div>
+  </section>
+
+</main>
+
+<script src="game.js"></script>
+</body>
+</html>
