@@ -34,14 +34,13 @@ function delay(ms) {
   return new Promise(res => setTimeout(res, ms));
 }
 
-// ===== DIFICULTAD PROGRESIVA REAL =====
+// ===== DIFICULTAD =====
 function generateSequence(words, level) {
 
   let seq = [];
 
   switch(level) {
 
-    // Nivel 1 → filas separadas
     case 1:
       seq = [
         words[1], words[1], words[1], words[1],
@@ -49,7 +48,6 @@ function generateSequence(words, level) {
       ];
       break;
 
-    // Nivel 2 → mezcla suave
     case 2:
       seq = [
         words[1], words[1], words[0], words[0],
@@ -57,7 +55,6 @@ function generateSequence(words, level) {
       ];
       break;
 
-    // Nivel 3 → parejas alternadas
     case 3:
       seq = [
         words[1], words[0], words[1], words[0],
@@ -65,7 +62,6 @@ function generateSequence(words, level) {
       ];
       break;
 
-    // Nivel 4 → casi alternado
     case 4:
       seq = [
         words[1], words[0], words[1], words[0],
@@ -73,7 +69,6 @@ function generateSequence(words, level) {
       ];
       break;
 
-    // Nivel 5 → ritmo perfecto
     case 5:
       seq = [
         words[0], words[1], words[0], words[1],
@@ -85,18 +80,38 @@ function generateSequence(words, level) {
   return seq;
 }
 
-// ===== GRID =====
+// ===== GRID (🔥 MODIFICADO CON IMÁGENES) =====
 function createGrid(sequence) {
   grid.innerHTML = "";
   cards = [];
+
+  const images = {
+    NANO: "img/nano.png",
+    AMO: "img/amo.png",
+    MAX: "img/max.png",
+    MAD: "img/mad.png",
+    MAZE: "img/maze.png",
+    SPIN: "img/spin.png"
+  };
 
   sequence.forEach(word => {
     const div = document.createElement("div");
     div.classList.add("card");
 
+    const img = document.createElement("img");
+    const text = document.createElement("div");
+
+    text.classList.add("card-text");
+
+    img.src = images[word];
+    img.alt = word;
+
     if (showTextCheckbox.checked) {
-      div.textContent = word;
+      text.textContent = word;
     }
+
+    div.appendChild(img);
+    div.appendChild(text);
 
     grid.appendChild(div);
     cards.push(div);
@@ -181,9 +196,25 @@ function startGame() {
   nivel = parseInt(startLevelSelect.value);
 
   const set = wordSetSelect.value;
-  const words = set === "casa"
-    ? ["CASA", "CAMA"]
-    : ["GATO", "PATO"];
+
+  let words;
+
+  switch(set) {
+    case "nano":
+      words = ["NANO", "AMO"];
+      break;
+
+    case "max":
+      words = ["MAX", "MAD"];
+      break;
+
+    case "maze":
+      words = ["MAZE", "SPIN"];
+      break;
+
+    default:
+      words = ["NANO", "AMO"];
+  }
 
   toggleControls(true);
   startTimer();
