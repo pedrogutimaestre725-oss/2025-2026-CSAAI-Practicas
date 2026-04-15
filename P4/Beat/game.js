@@ -20,7 +20,17 @@ let time = 0;
 let timerInterval;
 let musicOn = true;
 
-// ⚡ tiempos (activación + pausa)
+// 🎵 MÚSICA DINÁMICA
+let bgMusic = new Audio();
+bgMusic.loop = true;
+
+const musicTracks = {
+  nano: "audio/Nano.mp3",
+  max: "audio/Max.mp3",
+  maze: "audio/Maze.mp3"
+};
+
+// ⚡ tiempos
 const speeds = [
   {on: 500, off: 300},
   {on: 400, off: 250},
@@ -80,7 +90,7 @@ function generateSequence(words, level) {
   return seq;
 }
 
-// ===== GRID (🔥 MODIFICADO CON IMÁGENES) =====
+// ===== GRID =====
 function createGrid(sequence) {
   grid.innerHTML = "";
   cards = [];
@@ -197,6 +207,15 @@ function startGame() {
 
   const set = wordSetSelect.value;
 
+  // 🎵 CAMBIAR MÚSICA SEGÚN SET
+  if (musicOn) {
+    bgMusic.pause();
+    bgMusic = new Audio(musicTracks[set]);
+    bgMusic.loop = true;
+    bgMusic.volume = 0.5;
+    bgMusic.play();
+  }
+
   let words;
 
   switch(set) {
@@ -229,6 +248,8 @@ function stopGame() {
 
   stopTimer();
   toggleControls(false);
+
+  bgMusic.pause(); // 🔇 parar música
 }
 
 function endGame() {
@@ -238,6 +259,8 @@ function endGame() {
 
   stopTimer();
   toggleControls(false);
+
+  bgMusic.pause(); // 🔇 parar música
 }
 
 // ===== EVENTOS =====
@@ -246,5 +269,12 @@ stopBtn.onclick = stopGame;
 
 musicBtn.onclick = () => {
   musicOn = !musicOn;
+
+  if (musicOn) {
+    bgMusic.play();
+  } else {
+    bgMusic.pause();
+  }
+
   musicBtn.textContent = musicOn ? "🔊 Música ON" : "🔇 Música OFF";
 };

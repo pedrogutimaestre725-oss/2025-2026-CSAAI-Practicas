@@ -118,3 +118,93 @@ main {
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(255,0,0,0.6);
 }
+
+/* ========================= */
+/* 📲 TABLET RESPONSIVE */
+/* ========================= */
+@media (max-width: 1024px) {
+
+  main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .game {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .card {
+    height: 100px;
+  }
+
+  .card img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* ========================= */
+/* 📱 MÓVIL RESPONSIVE */
+/* ========================= */
+@media (max-width: 600px) {
+
+  header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .status span {
+    display: block;
+    margin: 5px 0;
+  }
+
+  main {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .panel {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .game {
+    width: 100%;
+    padding: 15px;
+  }
+
+  #message {
+    font-size: 20px;
+  }
+
+  /* 🔥 GRID MÁS ADAPTATIVO */
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .card {
+    height: 90px;
+    font-size: 14px;
+  }
+
+  .card img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-text {
+    font-size: 12px;
+  }
+}
