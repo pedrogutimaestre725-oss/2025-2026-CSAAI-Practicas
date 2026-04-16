@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #b8e994, #78e08f);
+  background: linear-gradient(135deg,#ff6b6b, #ff3b3b);
   margin: 0;
 }
 
@@ -13,9 +13,19 @@ header {
   color: #222;
 }
 
+.status {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .status span {
-  margin-left: 20px;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 main {
@@ -47,14 +57,14 @@ main {
 }
 
 .panel button {
-  background: #78e08f;
+  background: #ff6b6b;
   cursor: pointer;
   font-weight: bold;
   transition: 0.2s;
 }
 
 .panel button:hover {
-  background: #38ada9;
+  background: #ff3b3b;
   color: white;
 }
 

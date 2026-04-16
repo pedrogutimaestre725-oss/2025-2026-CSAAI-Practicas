@@ -29,7 +29,7 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 let recognition;
 let expectedWord = null;
 
-// ===== MÚSICA (SIN CARPETA audio/) =====
+// ===== MÚSICA =====
 let bgMusic = null;
 
 const musicTracks = {
@@ -82,7 +82,7 @@ function delay(ms) {
   return new Promise(res => setTimeout(res, ms));
 }
 
-// ===== GRID (SIN carpeta img/) =====
+// ===== GRID =====
 function createGrid(sequence) {
   grid.innerHTML = "";
   cards = [];
@@ -100,7 +100,6 @@ function createGrid(sequence) {
 
     const fileName = word.toUpperCase().trim();
 
-    // 🔥 SIN carpeta img/
     img.src = `./${fileName}.gif`;
     img.alt = word;
 
@@ -154,7 +153,7 @@ function loadMusic(track) {
   });
 }
 
-// ===== JUEGO =====
+// ===== PLAY LEVEL =====
 async function playLevel(isFirst = false) {
 
   if (!isFirst) {
@@ -165,9 +164,10 @@ async function playLevel(isFirst = false) {
       message.textContent = i;
       await delay(1000);
     }
-  }
 
-  message.textContent = "GO!";
+    message.textContent = "🏁";
+    await delay(600);
+  }
 
   const speed = speeds[nivel - 1];
 
@@ -210,6 +210,20 @@ async function gameLoop(words) {
     const sequence = generateSequence(words, nivel);
     createGrid(sequence);
 
+    // 🔥 CUENTA ATRÁS INICIAL SOLO PRIMERA VEZ
+    if (first) {
+      message.textContent = "Preparado...";
+      await delay(1000);
+
+      for (let i = 3; i > 0; i--) {
+        message.textContent = i;
+        await delay(1000);
+      }
+
+      message.textContent = "🏁";
+      await delay(600);
+    }
+
     await playLevel(first);
     first = false;
 
@@ -219,7 +233,7 @@ async function gameLoop(words) {
   endGame();
 }
 
-// ===== SECUENCIAS (SIN CAMBIOS) =====
+// ===== SECUENCIA =====
 function generateSequence(words, level) {
 
   let seq = [];
@@ -228,19 +242,15 @@ function generateSequence(words, level) {
     case 1:
       seq = [words[1], words[1], words[1], words[1], words[0], words[0], words[0], words[0]];
       break;
-
     case 2:
       seq = [words[1], words[1], words[0], words[0], words[1], words[0], words[1], words[0]];
       break;
-
     case 3:
       seq = [words[1], words[0], words[1], words[0], words[0], words[1], words[0], words[1]];
       break;
-
     case 4:
       seq = [words[1], words[0], words[1], words[0], words[1], words[0], words[1], words[0]];
       break;
-
     case 5:
       seq = [words[0], words[1], words[0], words[1], words[0], words[1], words[0], words[1]];
       break;
