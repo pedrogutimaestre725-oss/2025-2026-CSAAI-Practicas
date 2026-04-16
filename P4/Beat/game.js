@@ -1,3 +1,4 @@
+// ===== ELEMENTOS =====
 const grid = document.getElementById("grid");
 const message = document.getElementById("message");
 const nivelUI = document.getElementById("nivel");
@@ -6,13 +7,16 @@ const tiempoUI = document.getElementById("tiempo");
 
 const startBtn = document.getElementById("startBtn");
 const stopBtn = document.getElementById("stopBtn");
+const recordBtn = document.getElementById("recordBtn");
 
 const wordSetSelect = document.getElementById("wordSet");
 const startLevelSelect = document.getElementById("startLevel");
 const showTextCheckbox = document.getElementById("showText");
+const voiceCheckbox = document.getElementById("voiceMode");
 
 const musicBtn = document.getElementById("musicBtn");
 
+// ===== VARIABLES =====
 let cards = [];
 let playing = false;
 let nivel = 1;
@@ -20,7 +24,12 @@ let time = 0;
 let timerInterval;
 let musicOn = true;
 
-// 🎵 MÚSICA DINÁMICA
+// ===== VOZ =====
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+let expectedWord = null;
+
+// ===== MÚSICA =====
 let bgMusic = new Audio();
 bgMusic.loop = true;
 
@@ -30,7 +39,7 @@ const musicTracks = {
   maze: "audio/Maze.mp3"
 };
 
-// ⚡ tiempos
+// ===== VELOCIDADES =====
 const speeds = [
   {on: 500, off: 300},
   {on: 400, off: 250},
@@ -38,6 +47,40 @@ const speeds = [
   {on: 220, off: 150},
   {on: 160, off: 120}
 ];
+
+// ===== INICIALIZAR VOZ =====
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = "es-ES";
+
+  recognition.onresult = function(event) {
+    const texto = event.results[0][0].transcript.toUpperCase();
+    console.log("Has dicho:", texto);
+
+    if (!expectedWord) return;
+
+    if (texto.includes(expectedWord)) {
+      message.textContent = "✅ Correcto";
+    } else {
+      message.textContent = "❌ Incorrecto";
+    }
+  };
+
+} else {
+  alert("Reconocimiento de voz no soportado");
+}
+
+// ===== CONTROL VAR =====
+voiceCheckbox.addEventListener("change", () => {
+  if (!recognition) return;
+
+  if (!voiceCheckbox.checked) {
+    recognition.stop();
+    message.textContent = "🎤 VAR desactivado";
+  } else {
+    message.textContent = "🎤 VAR activado";
+  }
+});
 
 // ===== UTIL =====
 function delay(ms) {
@@ -50,7 +93,6 @@ function generateSequence(words, level) {
   let seq = [];
 
   switch(level) {
-
     case 1:
       seq = [
         words[1], words[1], words[1], words[1],
@@ -168,14 +210,28 @@ async function playLevel(isFirst = false) {
   for (let i = 0; i < cards.length; i++) {
     if (!playing) return;
 
+    const word = cards[i].querySelector(".card-text")?.textContent;
+    expectedWord = word;
+
     cards[i].classList.add("active");
+
+    // 🎤 VOZ SOLO SI VAR ACTIVADO
+    if (voiceCheckbox.checked && recognition) {
+      try {
+        recognition.start();
+      } catch (e) {}
+    }
+
     await delay(speed.on);
 
     cards[i].classList.remove("active");
     await delay(speed.off);
   }
+
+  expectedWord = null;
 }
 
+// ===== GAME LOOP =====
 async function gameLoop(words) {
 
   let first = true;
@@ -207,7 +263,6 @@ function startGame() {
 
   const set = wordSetSelect.value;
 
-  // 🎵 CAMBIAR MÚSICA SEGÚN SET
   if (musicOn) {
     bgMusic.pause();
     bgMusic = new Audio(musicTracks[set]);
@@ -222,15 +277,12 @@ function startGame() {
     case "nano":
       words = ["NANO", "AMO"];
       break;
-
     case "max":
       words = ["MAX", "MAD"];
       break;
-
     case "maze":
       words = ["MAZE", "SPIN"];
       break;
-
     default:
       words = ["NANO", "AMO"];
   }
@@ -248,8 +300,9 @@ function stopGame() {
 
   stopTimer();
   toggleControls(false);
+  bgMusic.pause();
 
-  bgMusic.pause(); // 🔇 parar música
+  if (recognition) recognition.stop();
 }
 
 function endGame() {
@@ -259,8 +312,9 @@ function endGame() {
 
   stopTimer();
   toggleControls(false);
+  bgMusic.pause();
 
-  bgMusic.pause(); // 🔇 parar música
+  if (recognition) recognition.stop();
 }
 
 // ===== EVENTOS =====
@@ -277,4 +331,25 @@ musicBtn.onclick = () => {
   }
 
   musicBtn.textContent = musicOn ? "🔊 Música ON" : "🔇 Música OFF";
+};
+
+// 🎤 BOTÓN GRABAR
+recordBtn.onclick = () => {
+
+  if (!voiceCheckbox.checked) {
+    message.textContent = "❌ Necesitas activar la función VAR primero";
+    return;
+  }
+
+  if (!recognition) {
+    message.textContent = "❌ Navegador no compatible";
+    return;
+  }
+
+  try {
+    recognition.start();
+    message.textContent = "🎤 Grabando...";
+  } catch (e) {
+    message.textContent = "⚠️ Ya está escuchando...";
+  }
 };
