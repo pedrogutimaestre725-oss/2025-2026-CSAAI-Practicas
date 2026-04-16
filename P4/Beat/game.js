@@ -29,14 +29,13 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 let recognition;
 let expectedWord = null;
 
-// ===== MÚSICA =====
-let bgMusic = new Audio();
-bgMusic.loop = true;
+// ===== MÚSICA (SIN CARPETA audio/) =====
+let bgMusic = null;
 
 const musicTracks = {
-  nano: "audio/Nano.mp3",
-  max: "audio/Max.mp3",
-  maze: "audio/Maze.mp3"
+  nano: "./Nano.mp3",
+  max: "./Max.mp3",
+  maze: "./Maze.mp3"
 };
 
 // ===== VELOCIDADES =====
@@ -64,9 +63,6 @@ if (SpeechRecognition) {
       message.textContent = "❌ Incorrecto";
     }
   };
-
-} else {
-  alert("Reconocimiento de voz no soportado");
 }
 
 // ===== CONTROL VAR =====
@@ -86,52 +82,7 @@ function delay(ms) {
   return new Promise(res => setTimeout(res, ms));
 }
 
-// ===== DIFICULTAD =====
-function generateSequence(words, level) {
-
-  let seq = [];
-
-  switch(level) {
-    case 1:
-      seq = [
-        words[1], words[1], words[1], words[1],
-        words[0], words[0], words[0], words[0]
-      ];
-      break;
-
-    case 2:
-      seq = [
-        words[1], words[1], words[0], words[0],
-        words[1], words[0], words[1], words[0]
-      ];
-      break;
-
-    case 3:
-      seq = [
-        words[1], words[0], words[1], words[0],
-        words[0], words[1], words[0], words[1]
-      ];
-      break;
-
-    case 4:
-      seq = [
-        words[1], words[0], words[1], words[0],
-        words[1], words[0], words[1], words[0]
-      ];
-      break;
-
-    case 5:
-      seq = [
-        words[0], words[1], words[0], words[1],
-        words[0], words[1], words[0], words[1]
-      ];
-      break;
-  }
-
-  return seq;
-}
-
-// ===== GRID =====
+// ===== GRID (SIN carpeta img/) =====
 function createGrid(sequence) {
   grid.innerHTML = "";
   cards = [];
@@ -140,22 +91,24 @@ function createGrid(sequence) {
     const div = document.createElement("div");
     div.classList.add("card");
 
+    div.dataset.word = word;
+
     const img = document.createElement("img");
     const text = document.createElement("div");
 
     text.classList.add("card-text");
 
-    // ✅ ARREGLO REAL (RUTA CORRECTA + DEBUG)
-    img.src = "./img/" + word + ".gif";
+    const fileName = word.toUpperCase().trim();
+
+    // 🔥 SIN carpeta img/
+    img.src = `./${fileName}.gif`;
     img.alt = word;
 
     img.onerror = () => {
-      console.error("❌ Error cargando imagen:", img.src);
+      console.error("❌ Imagen no encontrada:", img.src);
     };
 
-    if (showTextCheckbox.checked) {
-      text.textContent = word;
-    }
+    text.textContent = showTextCheckbox.checked ? word : "";
 
     div.appendChild(img);
     div.appendChild(text);
@@ -178,11 +131,27 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-// ===== CONTROLES =====
+// ===== CONTROL =====
 function toggleControls(disabled) {
   wordSetSelect.disabled = disabled;
   startLevelSelect.disabled = disabled;
   showTextCheckbox.disabled = disabled;
+}
+
+// ===== MÚSICA =====
+function loadMusic(track) {
+  if (bgMusic) {
+    bgMusic.pause();
+    bgMusic.src = "";
+  }
+
+  bgMusic = new Audio(track);
+  bgMusic.loop = true;
+  bgMusic.volume = 0.5;
+
+  bgMusic.play().catch(err => {
+    console.warn("Audio bloqueado:", err);
+  });
 }
 
 // ===== JUEGO =====
@@ -205,13 +174,15 @@ async function playLevel(isFirst = false) {
   for (let i = 0; i < cards.length; i++) {
     if (!playing) return;
 
-    const word = cards[i].querySelector(".card-text")?.textContent;
+    const word = cards[i].dataset.word;
+
     expectedWord = word;
 
     cards[i].classList.add("active");
 
     if (voiceCheckbox.checked && recognition) {
       try {
+        recognition.abort();
         recognition.start();
       } catch (e) {}
     }
@@ -225,7 +196,7 @@ async function playLevel(isFirst = false) {
   expectedWord = null;
 }
 
-// ===== GAME LOOP =====
+// ===== LOOP =====
 async function gameLoop(words) {
 
   let first = true;
@@ -248,7 +219,37 @@ async function gameLoop(words) {
   endGame();
 }
 
-// ===== ESTADOS =====
+// ===== SECUENCIAS (SIN CAMBIOS) =====
+function generateSequence(words, level) {
+
+  let seq = [];
+
+  switch(level) {
+    case 1:
+      seq = [words[1], words[1], words[1], words[1], words[0], words[0], words[0], words[0]];
+      break;
+
+    case 2:
+      seq = [words[1], words[1], words[0], words[0], words[1], words[0], words[1], words[0]];
+      break;
+
+    case 3:
+      seq = [words[1], words[0], words[1], words[0], words[0], words[1], words[0], words[1]];
+      break;
+
+    case 4:
+      seq = [words[1], words[0], words[1], words[0], words[1], words[0], words[1], words[0]];
+      break;
+
+    case 5:
+      seq = [words[0], words[1], words[0], words[1], words[0], words[1], words[0], words[1]];
+      break;
+  }
+
+  return seq;
+}
+
+// ===== START =====
 function startGame() {
   if (playing) return;
 
@@ -256,14 +257,6 @@ function startGame() {
   nivel = parseInt(startLevelSelect.value);
 
   const set = wordSetSelect.value;
-
-  if (musicOn) {
-    bgMusic.pause();
-    bgMusic = new Audio(musicTracks[set]);
-    bgMusic.loop = true;
-    bgMusic.volume = 0.5;
-    bgMusic.play();
-  }
 
   let words;
 
@@ -277,8 +270,10 @@ function startGame() {
     case "maze":
       words = ["MAZE", "SPIN"];
       break;
-    default:
-      words = ["NANO", "AMO"];
+  }
+
+  if (musicOn) {
+    loadMusic(musicTracks[set]);
   }
 
   toggleControls(true);
@@ -287,6 +282,7 @@ function startGame() {
   gameLoop(words);
 }
 
+// ===== STOP =====
 function stopGame() {
   playing = false;
   estadoUI.textContent = "Detenido";
@@ -294,11 +290,12 @@ function stopGame() {
 
   stopTimer();
   toggleControls(false);
-  bgMusic.pause();
 
+  if (bgMusic) bgMusic.pause();
   if (recognition) recognition.stop();
 }
 
+// ===== END =====
 function endGame() {
   playing = false;
   estadoUI.textContent = "Finalizado";
@@ -306,8 +303,8 @@ function endGame() {
 
   stopTimer();
   toggleControls(false);
-  bgMusic.pause();
 
+  if (bgMusic) bgMusic.pause();
   if (recognition) recognition.stop();
 }
 
@@ -318,9 +315,9 @@ stopBtn.onclick = stopGame;
 musicBtn.onclick = () => {
   musicOn = !musicOn;
 
-  if (musicOn) {
+  if (musicOn && bgMusic) {
     bgMusic.play();
-  } else {
+  } else if (bgMusic) {
     bgMusic.pause();
   }
 
@@ -328,14 +325,13 @@ musicBtn.onclick = () => {
 };
 
 recordBtn.onclick = () => {
-
   if (!voiceCheckbox.checked) {
-    message.textContent = "❌ Necesitas activar la función VAR primero";
+    message.textContent = "❌ Activa VAR primero";
     return;
   }
 
   if (!recognition) {
-    message.textContent = "❌ Navegador no compatible";
+    message.textContent = "❌ No compatible";
     return;
   }
 
@@ -343,6 +339,6 @@ recordBtn.onclick = () => {
     recognition.start();
     message.textContent = "🎤 Grabando...";
   } catch (e) {
-    message.textContent = "⚠️ Ya está escuchando...";
+    message.textContent = "⚠️ Ya activo";
   }
 };
