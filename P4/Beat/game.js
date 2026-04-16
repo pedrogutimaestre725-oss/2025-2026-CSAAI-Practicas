@@ -48,14 +48,13 @@ const speeds = [
   {on: 160, off: 120}
 ];
 
-// ===== INICIALIZAR VOZ =====
+// ===== VOZ =====
 if (SpeechRecognition) {
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
 
   recognition.onresult = function(event) {
     const texto = event.results[0][0].transcript.toUpperCase();
-    console.log("Has dicho:", texto);
 
     if (!expectedWord) return;
 
@@ -137,15 +136,6 @@ function createGrid(sequence) {
   grid.innerHTML = "";
   cards = [];
 
-  const images = {
-    NANO: "img/nano.png",
-    AMO: "img/amo.png",
-    MAX: "img/max.png",
-    MAD: "img/mad.png",
-    MAZE: "img/maze.png",
-    SPIN: "img/spin.png"
-  };
-
   sequence.forEach(word => {
     const div = document.createElement("div");
     div.classList.add("card");
@@ -155,8 +145,13 @@ function createGrid(sequence) {
 
     text.classList.add("card-text");
 
-    img.src = images[word];
+    // ✅ ARREGLO REAL (RUTA CORRECTA + DEBUG)
+    img.src = "./img/" + word + ".gif";
     img.alt = word;
+
+    img.onerror = () => {
+      console.error("❌ Error cargando imagen:", img.src);
+    };
 
     if (showTextCheckbox.checked) {
       text.textContent = word;
@@ -215,7 +210,6 @@ async function playLevel(isFirst = false) {
 
     cards[i].classList.add("active");
 
-    // 🎤 VOZ SOLO SI VAR ACTIVADO
     if (voiceCheckbox.checked && recognition) {
       try {
         recognition.start();
@@ -333,7 +327,6 @@ musicBtn.onclick = () => {
   musicBtn.textContent = musicOn ? "🔊 Música ON" : "🔇 Música OFF";
 };
 
-// 🎤 BOTÓN GRABAR
 recordBtn.onclick = () => {
 
   if (!voiceCheckbox.checked) {
