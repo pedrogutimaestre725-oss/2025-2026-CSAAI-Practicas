@@ -24,10 +24,15 @@ let time = 0;
 let timerInterval;
 let musicOn = true;
 
+// ===== VAR =====
+let spokenWords = [];
+let currentSequence = [];
+let totalCorrect = 0;
+let totalRounds = 0;
+
 // ===== VOZ =====
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition;
-let expectedWord = null;
 
 // ===== MÚSICA =====
 let bgMusic = null;
@@ -47,35 +52,20 @@ const speeds = [
   {on: 160, off: 120}
 ];
 
-// ===== VOZ =====
+// ===== VOZ CONFIG =====
 if (SpeechRecognition) {
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
+  recognition.continuous = true;
 
   recognition.onresult = function(event) {
-    const texto = event.results[0][0].transcript.toUpperCase();
+    const texto = event.results[event.results.length - 1][0].transcript.toUpperCase();
 
-    if (!expectedWord) return;
-
-    if (texto.includes(expectedWord)) {
-      message.textContent = "✅ Correcto";
-    } else {
-      message.textContent = "❌ Incorrecto";
-    }
+    texto.split(" ").forEach(word => {
+      spokenWords.push(word.trim());
+    });
   };
 }
-
-// ===== CONTROL VAR =====
-voiceCheckbox.addEventListener("change", () => {
-  if (!recognition) return;
-
-  if (!voiceCheckbox.checked) {
-    recognition.stop();
-    message.textContent = "🎤 VAR desactivado";
-  } else {
-    message.textContent = "🎤 VAR activado";
-  }
-});
 
 // ===== UTIL =====
 function delay(ms) {
@@ -98,14 +88,8 @@ function createGrid(sequence) {
 
     text.classList.add("card-text");
 
-    const fileName = word.toUpperCase().trim();
-
-    img.src = `./${fileName}.gif`;
+    img.src = `./${word}.gif`;
     img.alt = word;
-
-    img.onerror = () => {
-      console.error("❌ Imagen no encontrada:", img.src);
-    };
 
     text.textContent = showTextCheckbox.checked ? word : "";
 
@@ -147,26 +131,34 @@ function loadMusic(track) {
   bgMusic = new Audio(track);
   bgMusic.loop = true;
   bgMusic.volume = 0.5;
+  bgMusic.play();
+}
 
-  bgMusic.play().catch(err => {
-    console.warn("Audio bloqueado:", err);
-  });
+// ===== EVALUACIÓN =====
+function evaluateRound() {
+  let correct = 0;
+  let index = 0;
+
+  for (let i = 0; i < spokenWords.length; i++) {
+    if (spokenWords[i] === currentSequence[index]) {
+      correct++;
+      index++;
+    }
+    if (index >= currentSequence.length) break;
+  }
+
+  return correct;
 }
 
 // ===== PLAY LEVEL =====
 async function playLevel(isFirst = false) {
 
+  spokenWords = [];
+  currentSequence = cards.map(c => c.dataset.word);
+
   if (!isFirst) {
     message.textContent = "Are you ready...";
-    await delay(3000);
-
-    for (let i = 3; i > 0; i--) {
-      message.textContent = i;
-      await delay(1000);
-    }
-
-    message.textContent = "🏁";
-    await delay(600);
+    await delay(1500);
   }
 
   const speed = speeds[nivel - 1];
@@ -174,17 +166,10 @@ async function playLevel(isFirst = false) {
   for (let i = 0; i < cards.length; i++) {
     if (!playing) return;
 
-    const word = cards[i].dataset.word;
-
-    expectedWord = word;
-
     cards[i].classList.add("active");
 
     if (voiceCheckbox.checked && recognition) {
-      try {
-        recognition.abort();
-        recognition.start();
-      } catch (e) {}
+      try { recognition.start(); } catch (e) {}
     }
 
     await delay(speed.on);
@@ -193,11 +178,57 @@ async function playLevel(isFirst = false) {
     await delay(speed.off);
   }
 
-  expectedWord = null;
+  // ===== EVALUACIÓN =====
+  if (voiceCheckbox.checked && recognition) {
+
+    recognition.stop();
+
+    message.textContent = "⏳ Calculando...";
+    await delay(2000);
+
+    const correct = evaluateRound();
+    totalCorrect += correct;
+    totalRounds += 8;
+
+    let resultado = "";
+
+    if (correct >= 7) resultado = `✅ Correcto (${correct}/8)`;
+    else if (correct >= 4) resultado = `⚠️ Parcial (${correct}/8)`;
+    else resultado = `❌ Incorrecto (${correct}/8)`;
+
+    message.textContent = resultado;
+    await delay(3000);
+
+    // 🔥 RESTO HASTA 10s TOTAL
+    message.textContent = "Preparado...";
+    await delay(1000);
+
+    for (let i = 3; i > 0; i--) {
+      message.textContent = i;
+      await delay(1000);
+    }
+
+    message.textContent = "🏁";
+    await delay(1000);
+  }
+}
+
+// ===== SECUENCIA =====
+function generateSequence(words, level) {
+  switch(level) {
+    case 1: return [words[1],words[1],words[1],words[1],words[0],words[0],words[0],words[0]];
+    case 2: return [words[1],words[1],words[0],words[0],words[1],words[0],words[1],words[0]];
+    case 3: return [words[1],words[0],words[1],words[0],words[0],words[1],words[0],words[1]];
+    case 4: return [words[1],words[0],words[1],words[0],words[1],words[0],words[1],words[0]];
+    case 5: return [words[0],words[1],words[0],words[1],words[0],words[1],words[0],words[1]];
+  }
 }
 
 // ===== LOOP =====
 async function gameLoop(words) {
+
+  totalCorrect = 0;
+  totalRounds = 0;
 
   let first = true;
 
@@ -210,16 +241,13 @@ async function gameLoop(words) {
     const sequence = generateSequence(words, nivel);
     createGrid(sequence);
 
-    // 🔥 CUENTA ATRÁS INICIAL SOLO PRIMERA VEZ
     if (first) {
       message.textContent = "Preparado...";
       await delay(1000);
-
       for (let i = 3; i > 0; i--) {
         message.textContent = i;
         await delay(1000);
       }
-
       message.textContent = "🏁";
       await delay(600);
     }
@@ -233,32 +261,6 @@ async function gameLoop(words) {
   endGame();
 }
 
-// ===== SECUENCIA =====
-function generateSequence(words, level) {
-
-  let seq = [];
-
-  switch(level) {
-    case 1:
-      seq = [words[1], words[1], words[1], words[1], words[0], words[0], words[0], words[0]];
-      break;
-    case 2:
-      seq = [words[1], words[1], words[0], words[0], words[1], words[0], words[1], words[0]];
-      break;
-    case 3:
-      seq = [words[1], words[0], words[1], words[0], words[0], words[1], words[0], words[1]];
-      break;
-    case 4:
-      seq = [words[1], words[0], words[1], words[0], words[1], words[0], words[1], words[0]];
-      break;
-    case 5:
-      seq = [words[0], words[1], words[0], words[1], words[0], words[1], words[0], words[1]];
-      break;
-  }
-
-  return seq;
-}
-
 // ===== START =====
 function startGame() {
   if (playing) return;
@@ -268,28 +270,18 @@ function startGame() {
 
   const set = wordSetSelect.value;
 
-  let words;
+  const wordsMap = {
+    nano: ["NANO","AMO"],
+    max: ["MAX","MAD"],
+    maze: ["MAZE","SPIN"]
+  };
 
-  switch(set) {
-    case "nano":
-      words = ["NANO", "AMO"];
-      break;
-    case "max":
-      words = ["MAX", "MAD"];
-      break;
-    case "maze":
-      words = ["MAZE", "SPIN"];
-      break;
-  }
-
-  if (musicOn) {
-    loadMusic(musicTracks[set]);
-  }
+  if (musicOn) loadMusic(musicTracks[set]);
 
   toggleControls(true);
   startTimer();
 
-  gameLoop(words);
+  gameLoop(wordsMap[set]);
 }
 
 // ===== STOP =====
@@ -309,7 +301,13 @@ function stopGame() {
 function endGame() {
   playing = false;
   estadoUI.textContent = "Finalizado";
-  message.textContent = "¡Juego terminado!";
+
+  const porcentaje = Math.round((totalCorrect / totalRounds) * 100);
+
+  message.innerHTML = `
+    🎉 Fin de Juego<br>
+    Puntuación: ${totalCorrect}/${totalRounds} (${porcentaje}%)
+  `;
 
   stopTimer();
   toggleControls(false);
@@ -324,12 +322,8 @@ stopBtn.onclick = stopGame;
 
 musicBtn.onclick = () => {
   musicOn = !musicOn;
-
-  if (musicOn && bgMusic) {
-    bgMusic.play();
-  } else if (bgMusic) {
-    bgMusic.pause();
-  }
+  if (musicOn && bgMusic) bgMusic.play();
+  else if (bgMusic) bgMusic.pause();
 
   musicBtn.textContent = musicOn ? "🔊 Música ON" : "🔇 Música OFF";
 };
@@ -340,15 +334,11 @@ recordBtn.onclick = () => {
     return;
   }
 
-  if (!recognition) {
-    message.textContent = "❌ No compatible";
-    return;
-  }
-
   try {
+    spokenWords = [];
     recognition.start();
     message.textContent = "🎤 Grabando...";
-  } catch (e) {
+  } catch {
     message.textContent = "⚠️ Ya activo";
   }
 };
