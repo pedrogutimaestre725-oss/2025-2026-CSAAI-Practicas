@@ -156,11 +156,6 @@ async function playLevel(isFirst = false) {
   spokenWords = [];
   currentSequence = cards.map(c => c.dataset.word);
 
-  if (!isFirst) {
-    message.textContent = "Are you ready...";
-    await delay(1500);
-  }
-
   const speed = speeds[nivel - 1];
 
   for (let i = 0; i < cards.length; i++) {
@@ -198,18 +193,6 @@ async function playLevel(isFirst = false) {
 
     message.textContent = resultado;
     await delay(3000);
-
-    // 🔥 RESTO HASTA 10s TOTAL
-    message.textContent = "Preparado...";
-    await delay(1000);
-
-    for (let i = 3; i > 0; i--) {
-      message.textContent = i;
-      await delay(1000);
-    }
-
-    message.textContent = "🏁";
-    await delay(1000);
   }
 }
 
@@ -239,18 +222,20 @@ async function gameLoop(words) {
     document.getElementById("gameLevel").textContent = `${nivel}/5`;
 
     const sequence = generateSequence(words, nivel);
-    createGrid(sequence);
 
-    if (first) {
-      message.textContent = "Preparado...";
+    // 🔥 AHORA LAS TARJETAS SE ACTUALIZAN EN "PREPARADO"
+    message.textContent = "Preparado...";
+    await delay(1000);
+
+    createGrid(sequence); // 👈 CAMBIO CLAVE
+
+    for (let i = 3; i > 0; i--) {
+      message.textContent = i;
       await delay(1000);
-      for (let i = 3; i > 0; i--) {
-        message.textContent = i;
-        await delay(1000);
-      }
-      message.textContent = "🏁";
-      await delay(600);
     }
+
+    message.textContent = "🏁";
+    await delay(600);
 
     await playLevel(first);
     first = false;
