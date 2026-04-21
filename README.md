@@ -2,10 +2,13 @@
 Mis prácticas de la asignatura Construcción de Servicios y Aplicaciones Audiovisuales en Internet Curso 2025-2026:
 
 - [Práctica 1 (CV)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P1/CV/index.html)
+
 - [Práctica 2 (¡Boom!)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P2/Boom/index.html)
 
 - [Práctica 3 (Space Invaders)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P3/AI/index.html)
 
 - [Práctica 4 (Beat The Word)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P4/Beat/index.html)
+
+- [Práctica 5 (Bot League)](https://pedrogutimaestre725-oss.github.io/2025-2026-CSAAI-Practicas/P5/Bot/index.html)
 
 URJC Profe

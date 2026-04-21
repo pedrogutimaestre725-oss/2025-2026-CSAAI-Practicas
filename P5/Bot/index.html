@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bot League</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- OVERLAY (MENÚ + FINAL) -->
+<div id="overlay">
+  <div id="menu">
+    <h1>⚽ BOT LEAGUE ⚽</h1>
+    <p>Selecciona modo:</p>
+    <p>1 → Gol de oro</p>
+    <p>2 → A 3 goles</p>
+  </div>
+
+  <div id="final" style="display:none;"></div>
+</div>
+
+<!-- UI SUPERIOR -->
+<div id="topUI">
+  <h1>Bot League</h1>
+  <div id="score">
+    <span id="blueScore">0</span>
+    <span>-</span>
+    <span id="redScore">0</span>
+  </div>
+</div>
+
+<!-- CANVAS -->
+<canvas id="game"></canvas>
+
+<!-- MENSAJES -->
+<div id="countdown"></div>
+<div id="goalMsg"></div>
+
+<script src="game.js"></script>
+</body>
+</html>
