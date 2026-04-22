@@ -116,12 +116,10 @@ class Player {
       let baseX = this.color === "blue" ? 80 : canvas.width - 80;
       let baseY = canvas.height / 2;
 
-      // sigue el balón si entra en su zona
       if (distance(this, ball) < 160) {
         targetX = ball.x;
         targetY = ball.y;
       } else {
-        // pequeño movimiento vertical dinámico
         targetX = baseX;
         targetY = baseY + Math.sin(Date.now() * 0.002) * 60;
       }
@@ -195,27 +193,37 @@ class Ball {
     let goalTop = canvas.height/2 - goalHeight/2;
     let goalBottom = canvas.height/2 + goalHeight/2;
 
+    // ARRIBA / ABAJO
+    if (this.y <= this.r) {
+      this.y = this.r;
+      this.vy *= -1.2;
+    }
+    if (this.y >= canvas.height - this.r) {
+      this.y = canvas.height - this.r;
+      this.vy *= -1.2;
+    }
+
     // IZQUIERDA
     if (this.x <= this.r) {
-    if (this.y > goalTop && this.y < goalBottom) {
+      if (this.y > goalTop && this.y < goalBottom) {
         goal("red");
-    } else {
+      } else {
         this.x = this.r;
         this.vx *= -1.2;
-    }
+      }
     }
 
     // DERECHA
     if (this.x >= canvas.width - this.r) {
-    if (this.y > goalTop && this.y < goalBottom) {
+      if (this.y > goalTop && this.y < goalBottom) {
         goal("blue");
-    } else {
+      } else {
         this.x = canvas.width - this.r;
         this.vx *= -1.2;
-    }
+      }
     }
 
-    // 🔥 ANTI-BUG ATASCO
+    // anti-atasco
     if (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1) {
       this.vx += (Math.random() - 0.5) * 4;
       this.vy += (Math.random() - 0.5) * 4;
@@ -286,7 +294,7 @@ function setupTeams() {
   }
 }
 
-// --- GOAL / RESTO IGUAL ---
+// --- GOAL ---
 function goal(teamScored) {
   playing = false;
 
@@ -365,6 +373,7 @@ function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+// 🔥 PORTERÍAS BIEN DIBUJADAS
 function drawField() {
   ctx.fillStyle = "#1e7a3a";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -372,36 +381,30 @@ function drawField() {
   ctx.strokeStyle = "white";
   ctx.lineWidth = 2;
 
-  // línea central
   ctx.beginPath();
-  ctx.moveTo(canvas.width / 2, 0);
-  ctx.lineTo(canvas.width / 2, canvas.height);
+  ctx.moveTo(canvas.width/2, 0);
+  ctx.lineTo(canvas.width/2, canvas.height);
   ctx.stroke();
 
-  // círculo central
   ctx.beginPath();
-  ctx.arc(canvas.width / 2, canvas.height / 2, 60, 0, Math.PI * 2);
+  ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
   ctx.stroke();
 
-  // --- PORTERÍAS VISUALES ---
   let goalTop = canvas.height/2 - goalHeight/2;
   let goalBottom = canvas.height/2 + goalHeight/2;
 
   ctx.fillStyle = "white";
 
-  // POSTE SUPERIOR IZQUIERDA
+  // izquierda
   ctx.fillRect(0, 0, 10, goalTop);
-
-  // POSTE INFERIOR IZQUIERDA
   ctx.fillRect(0, goalBottom, 10, canvas.height - goalBottom);
 
-  // POSTE SUPERIOR DERECHA
+  // derecha
   ctx.fillRect(canvas.width - 10, 0, 10, goalTop);
-
-  // POSTE INFERIOR DERECHA
   ctx.fillRect(canvas.width - 10, goalBottom, 10, canvas.height - goalBottom);
 }
 
+// --- LOOP ---
 function loop() {
   requestAnimationFrame(loop);
 
