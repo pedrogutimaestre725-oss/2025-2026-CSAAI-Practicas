@@ -19,10 +19,12 @@ let mode = null;
 let team = null;
 let playing = false;
 let menuState = "mode";
+let gameEnded = false;
 
 let score = { blue: 0, red: 0 };
 
 const goalHeight = 150;
+const PLAYER_SPEED = 2.5;
 
 // --- INPUT ---
 let keys = {};
@@ -62,8 +64,21 @@ document.addEventListener("keydown", e => {
     ball.vy = player.dir.y * 7;
   }
 
-  if (e.key === "r") location.reload();
-  if (e.key === "m") location.reload();
+  // 🔥 REINICIO REAL
+  if (e.key === "r" && gameEnded) {
+    score = { blue: 0, red: 0 };
+    updateScore();
+    gameEnded = false;
+    overlay.style.display = "none";
+    setupTeams();
+    ball.reset();
+    startCountdown();
+  }
+
+  // 🔥 VOLVER AL MENÚ
+  if (e.key === "m" && gameEnded) {
+    location.reload();
+  }
 });
 
 document.addEventListener("keyup", e => {
@@ -88,8 +103,11 @@ class Player {
     this.color = color;
     this.role = role;
     this.isUser = isUser;
-    this.speed = 2.5;
+    this.speed = PLAYER_SPEED;
     this.dir = { x: 1, y: 0 };
+
+    this.baseX = x;
+    this.baseY = y;
   }
 
   update() {
@@ -111,32 +129,33 @@ class Player {
     let targetX = ball.x;
     let targetY = ball.y;
 
-    // DEFENSIVO MEJORADO
+    // DEFENSIVO SIN TELEPORT
     if (this.role === "defensive") {
-      let baseX = this.color === "blue" ? 80 : canvas.width - 80;
-      let baseY = canvas.height / 2;
-
-      if (distance(this, ball) < 160) {
+      if (distance(this, ball) < 140) {
         targetX = ball.x;
         targetY = ball.y;
       } else {
-        targetX = baseX;
-        targetY = baseY + Math.sin(Date.now() * 0.002) * 60;
+        targetX = this.baseX;
+        targetY = this.baseY;
       }
     }
+
+    // MOVIMIENTO EN CRUZ
+    if (targetX > this.x + 2) this.x += this.speed;
+    else if (targetX < this.x - 2) this.x -= this.speed;
+
+    if (targetY > this.y + 2) this.y += this.speed;
+    else if (targetY < this.y - 2) this.y -= this.speed;
 
     // separación bots
     players.forEach(other => {
       if (other === this) return;
       let d = distance(this, other);
       if (d < this.r * 2) {
-        this.x += (this.x - other.x) * 0.05;
-        this.y += (this.y - other.y) * 0.05;
+        this.x += (this.x - other.x) * 0.1;
+        this.y += (this.y - other.y) * 0.1;
       }
     });
-
-    this.x += (targetX - this.x) * 0.03;
-    this.y += (targetY - this.y) * 0.03;
 
     if (distance(this, ball) < 22) {
       ball.kick(this);
@@ -164,7 +183,7 @@ class Player {
   }
 }
 
-// --- BALL ---
+// --- BALL (NO TOCADA) ---
 class Ball {
   constructor() {
     this.reset();
@@ -193,7 +212,6 @@ class Ball {
     let goalTop = canvas.height/2 - goalHeight/2;
     let goalBottom = canvas.height/2 + goalHeight/2;
 
-    // ARRIBA / ABAJO
     if (this.y <= this.r) {
       this.y = this.r;
       this.vy *= -1.2;
@@ -203,7 +221,6 @@ class Ball {
       this.vy *= -1.2;
     }
 
-    // IZQUIERDA
     if (this.x <= this.r) {
       if (this.y > goalTop && this.y < goalBottom) {
         goal("red");
@@ -213,7 +230,6 @@ class Ball {
       }
     }
 
-    // DERECHA
     if (this.x >= canvas.width - this.r) {
       if (this.y > goalTop && this.y < goalBottom) {
         goal("blue");
@@ -223,7 +239,6 @@ class Ball {
       }
     }
 
-    // anti-atasco
     if (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1) {
       this.vx += (Math.random() - 0.5) * 4;
       this.vy += (Math.random() - 0.5) * 4;
@@ -246,7 +261,7 @@ class Ball {
 
 const ball = new Ball();
 
-// --- COLISIONES ---
+// --- COLISIONES (NO TOCADO) ---
 function handleCollisions() {
   players.forEach(p => {
     let dx = ball.x - p.x;
@@ -273,7 +288,7 @@ function handleCollisions() {
   });
 }
 
-// --- EQUIPOS ---
+// --- EQUIPOS SIMÉTRICOS ---
 let players = [];
 
 function setupTeams() {
@@ -281,39 +296,43 @@ function setupTeams() {
     players = [
       new Player(200, 250, "blue", "user", true),
       new Player(100, 250, "blue", "defensive"),
-      new Player(700, 200, "red", "aggressive"),
-      new Player(750, 300, "red", "defensive")
+      new Player(700, 250, "red", "aggressive"),
+      new Player(800, 250, "red", "defensive")
     ];
   } else {
     players = [
       new Player(700, 250, "red", "user", true),
       new Player(800, 250, "red", "defensive"),
-      new Player(200, 200, "blue", "aggressive"),
-      new Player(150, 300, "blue", "defensive")
+      new Player(200, 250, "blue", "aggressive"),
+      new Player(100, 250, "blue", "defensive")
     ];
   }
 }
 
 // --- GOAL ---
 function goal(teamScored) {
+  if (gameEnded) return;
+
   playing = false;
 
   score[teamScored]++;
   updateScore();
   showGoal();
 
-  if (
-    (mode === "3" && score[teamScored] >= 3) ||
-    (mode === "golden")
-  ) {
-    endGame(teamScored);
-    return;
-  }
-
   setTimeout(() => {
+
+    if (
+      (mode === "3" && score[teamScored] >= 3) ||
+      (mode === "golden")
+    ) {
+      endGame(teamScored);
+      return;
+    }
+
     ball.reset();
     setupTeams();
     startCountdown();
+
   }, 2000);
 }
 
@@ -327,22 +346,26 @@ function showGoal() {
   setTimeout(() => goalMsg.innerHTML = "", 2000);
 }
 
+// --- FINAL CORRECTO ---
 function endGame(winner) {
-  playing = false;
+  gameEnded = true;
 
-  overlay.style.display = "flex";
-  menuEl.style.display = "none";
+  setTimeout(() => {
+    overlay.style.display = "flex";
+    menuEl.style.display = "none";
 
-  finalEl.style.display = "block";
-  finalEl.innerHTML = `
-    <h1>${winner === team ? "🏆 GANASTE" : "💀 PERDISTE"}</h1>
-    <p>${score.blue} - ${score.red}</p>
-    <br>
-    <p>R → Reiniciar</p>
-    <p>M → Menú</p>
-  `;
+    finalEl.style.display = "block";
+    finalEl.innerHTML = `
+      <h1>${winner === team ? "🏆 GANASTE" : "💀 PERDISTE"}</h1>
+      <p>${score.blue} - ${score.red}</p>
+      <br>
+      <p>R → Revancha</p>
+      <p>M → Menú</p>
+    `;
+  }, 2000);
 }
 
+// --- RESTO IGUAL ---
 function startCountdown() {
   let count = 3;
   countdownEl.textContent = count;
@@ -373,7 +396,7 @@ function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-// 🔥 PORTERÍAS BIEN DIBUJADAS
+// PORTERÍAS (NO TOCADAS)
 function drawField() {
   ctx.fillStyle = "#1e7a3a";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -395,16 +418,14 @@ function drawField() {
 
   ctx.fillStyle = "white";
 
-  // izquierda
   ctx.fillRect(0, 0, 10, goalTop);
   ctx.fillRect(0, goalBottom, 10, canvas.height - goalBottom);
 
-  // derecha
   ctx.fillRect(canvas.width - 10, 0, 10, goalTop);
   ctx.fillRect(canvas.width - 10, goalBottom, 10, canvas.height - goalBottom);
 }
 
-// --- LOOP ---
+// LOOP
 function loop() {
   requestAnimationFrame(loop);
 
