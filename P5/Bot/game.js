@@ -254,16 +254,14 @@ class Ball {
       }
     }
 
-    // 🔥 ANTI-STUCK ESQUINAS (PRO)
-    const stuckCorner =
-      (this.x < 20 && this.y < 20) ||
-      (this.x > canvas.width - 20 && this.y < 20) ||
-      (this.x < 20 && this.y > canvas.height - 20) ||
-      (this.x > canvas.width - 20 && this.y > canvas.height - 20);
+    // 🧲 FIX ESQUINAS PRO (NO STUCK REAL)
+    const nearEdgeX = this.x < this.r + 3 || this.x > canvas.width - this.r - 3;
+    const nearEdgeY = this.y < this.r + 3 || this.y > canvas.height - this.r - 3;
 
-    if (stuckCorner && Math.abs(this.vx) < 2 && Math.abs(this.vy) < 2) {
-      this.vx = (Math.random() > 0.5 ? 1 : -1) * 6;
-      this.vy = (Math.random() > 0.5 ? 1 : -1) * 6;
+    // si está en esquina + casi parado → lo sacamos suavemente
+    if (nearEdgeX && nearEdgeY && Math.abs(this.vx) < 1.5 && Math.abs(this.vy) < 1.5) {
+      this.vx += (Math.random() - 0.5) * 6;
+      this.vy += (Math.random() - 0.5) * 6;
     }
   }
 
@@ -308,6 +306,42 @@ function handleCollisions() {
       ball.vy += ny * 3;
     }
   });
+
+  // 🧲 anti bloqueo en esquinas
+  const inCorner =
+    (ball.x < 25 && ball.y < 25) ||
+    (ball.x > canvas.width - 25 && ball.y < 25) ||
+    (ball.x < 25 && ball.y > canvas.height - 25) ||
+    (ball.x > canvas.width - 25 && ball.y > canvas.height - 25);
+
+  if (inCorner) {
+    players.forEach(p => {
+      let dx = ball.x - p.x;
+      let dy = ball.y - p.y;
+      let dist = Math.hypot(dx, dy);
+
+      if (dist < 40) {
+        // empuja al jugador suavemente fuera del balón
+        p.x += dx * 0.08;
+        p.y += dy * 0.08;
+      }
+    });
+  }
+
+  const stuck =
+    Math.abs(ball.vx) < 0.2 &&
+    Math.abs(ball.vy) < 0.2 &&
+    (
+      ball.x < 20 ||
+      ball.x > canvas.width - 20 ||
+      ball.y < 20 ||
+      ball.y > canvas.height - 20
+    );
+
+  if (stuck) {
+    ball.vx += (Math.random() - 0.5) * 5;
+    ball.vy += (Math.random() - 0.5) * 5;
+  }
 }
 
 // --- EQUIPOS ---
