@@ -13,6 +13,7 @@ const goalMsg = document.getElementById("goalMsg");
 
 const blueScoreEl = document.getElementById("blueScore");
 const redScoreEl = document.getElementById("redScore");
+const timeEl = document.getElementById("time");
 
 // --- ESTADO ---
 let mode = null;
@@ -22,6 +23,8 @@ let menuState = "mode";
 let gameEnded = false;
 
 let score = { blue: 0, red: 0 };
+let gameTime = 0; // segundos
+let lastTimeUpdate = 0;
 
 const goalHeight = 150;
 const PLAYER_SPEED = 2.5;
@@ -71,10 +74,23 @@ document.addEventListener("keydown", e => {
     score = { blue: 0, red: 0 };
     updateScore();
     gameEnded = false;
+    gameTime = 0;
     overlay.style.display = "none";
     setupTeams();
     ball.reset();
     startCountdown();
+  }
+
+    // 🔄 RESET BALÓN EN PARTIDA (tipo saque)
+  if (e.key === "r" && playing && !gameEnded) {
+    ball.reset();
+
+    // opcional: parar un momento y reanudar
+    playing = false;
+
+    setTimeout(() => {
+      startCountdown();
+    }, 300);
   }
 
   if (e.key === "m" && gameEnded) {
@@ -104,7 +120,7 @@ class Player {
     this.color = color;
     this.role = role;
     this.isUser = isUser;
-    this.speed = PLAYER_SPEED;
+    this.speed = isUser ? PLAYER_SPEED + 0.7 : PLAYER_SPEED;
     this.dir = { x: 1, y: 0 };
 
     this.baseX = x;
@@ -272,10 +288,19 @@ class Ball {
   }
 
   draw() {
+    // balón base
     ctx.beginPath();
     ctx.fillStyle = "white";
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
+
+    // patrón simple (tipo fútbol)
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r - 3, 0, Math.PI * 2);
+    ctx.stroke();
   }
 }
 
@@ -342,27 +367,71 @@ function handleCollisions() {
     ball.vx += (Math.random() - 0.5) * 5;
     ball.vy += (Math.random() - 0.5) * 5;
   }
-}
+  // 🥅 POSTES CON COLISIÓN REAL
+  const goalTop = canvas.height/2 - goalHeight/2;
+  const goalBottom = canvas.height/2 + goalHeight/2;
 
-// --- EQUIPOS ---
-let players = [];
+  const posts = [
+    // izquierda arriba
+    {x: 10, y: goalTop},
+    // izquierda abajo
+    {x: 10, y: goalBottom},
 
-function setupTeams() {
-  if (team === "blue") {
-    players = [
-      new Player(200, 250, "blue", "user", true),
-      new Player(100, 250, "blue", "defensive"),
-      new Player(700, 250, "red", "aggressive"),
-      new Player(800, 250, "red", "defensive")
-    ];
-  } else {
-    players = [
-      new Player(700, 250, "red", "user", true),
-      new Player(800, 250, "red", "defensive"),
-      new Player(200, 250, "blue", "aggressive"),
-      new Player(100, 250, "blue", "defensive")
-    ];
+    // derecha arriba
+    {x: canvas.width - 10, y: goalTop},
+    // derecha abajo
+    {x: canvas.width - 10, y: goalBottom}
+  ];
+
+  posts.forEach(post => {
+    let dx = ball.x - post.x;
+    let dy = ball.y - post.y;
+    let dist = Math.hypot(dx, dy);
+
+    const postRadius = 8; // tamaño del poste
+    const minDist = ball.r + postRadius;
+
+    if (dist < minDist) {
+      let nx = dx / dist;
+      let ny = dy / dist;
+
+      // sacar balón fuera del poste
+      let overlap = minDist - dist;
+      ball.x += nx * overlap;
+      ball.y += ny * overlap;
+
+      // rebote tipo pared
+      let dot = ball.vx * nx + ball.vy * ny;
+      ball.vx -= 2 * dot * nx;
+      ball.vy -= 2 * dot * ny;
+
+      // pequeño boost para que no se quede muerto
+      ball.vx += nx * 2;
+      ball.vy += ny * 2;
+    }
+  });
+
   }
+
+  // --- EQUIPOS ---
+  let players = [];
+
+  function setupTeams() {
+    if (team === "blue") {
+      players = [
+        new Player(200, 250, "blue", "user", true),
+        new Player(100, 250, "blue", "defensive"),
+        new Player(700, 250, "red", "aggressive"),
+        new Player(800, 250, "red", "defensive")
+      ];
+    } else {
+      players = [
+        new Player(700, 250, "red", "user", true),
+        new Player(800, 250, "red", "defensive"),
+        new Player(200, 250, "blue", "aggressive"),
+        new Player(100, 250, "blue", "defensive")
+      ];
+    }
 }
 
 // --- GOAL / RESTO IGUAL (sin tocar) ---
@@ -396,6 +465,17 @@ function updateScore() {
   blueScoreEl.textContent = score.blue;
   redScoreEl.textContent = score.red;
 }
+
+function updateTime() {
+  let minutes = Math.floor(gameTime / 60);
+  let seconds = gameTime % 60;
+
+  let m = minutes < 10 ? "0" + minutes : minutes;
+  let s = seconds < 10 ? "0" + seconds : seconds;
+
+  timeEl.textContent = `${m}:${s}`;
+}
+
 
 function showGoal() {
   goalMsg.innerHTML = "⚽ GOOOOOL ⚽";
@@ -441,6 +521,8 @@ function startGame() {
   overlay.style.display = "none";
   menuState = "playing";
 
+  gameTime = 0;
+
   setupTeams();
   ball.reset();
   startCountdown();
@@ -450,38 +532,100 @@ function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-// PORTERÍAS
 function drawField() {
+  // --- CÉSPED BASE ---
   ctx.fillStyle = "#1e7a3a";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // --- LÍNEAS PRINCIPALES ---
   ctx.strokeStyle = "white";
   ctx.lineWidth = 2;
 
+  // medio campo
   ctx.beginPath();
   ctx.moveTo(canvas.width/2, 0);
   ctx.lineTo(canvas.width/2, canvas.height);
   ctx.stroke();
 
+  // círculo central
   ctx.beginPath();
   ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI*2);
   ctx.stroke();
 
+  // punto central
+  ctx.beginPath();
+  ctx.arc(canvas.width/2, canvas.height/2, 3, 0, Math.PI*2);
+  ctx.fillStyle = "white";
+  ctx.fill();
+
   let goalTop = canvas.height/2 - goalHeight/2;
   let goalBottom = canvas.height/2 + goalHeight/2;
 
+  // --- ÁREAS GRANDES ---
+  ctx.strokeRect(0, canvas.height/2 - 100, 120, 200);
+  ctx.strokeRect(canvas.width - 120, canvas.height/2 - 100, 120, 200);
+
+  // --- ÁREAS PEQUEÑAS ---
+  ctx.strokeRect(0, canvas.height/2 - 60, 60, 120);
+  ctx.strokeRect(canvas.width - 60, canvas.height/2 - 60, 60, 120);
+
+  // --- PORTERÍAS (POSTES + RED VISUAL) ---
+  ctx.fillStyle = "#cccccc";
+
+  // izquierda
+  ctx.fillRect(0, goalTop, 10, goalHeight);
+
+  // derecha
+  ctx.fillRect(canvas.width - 10, goalTop, 10, goalHeight);
+
+  // --- REDES (efecto visual) ---
+  ctx.strokeStyle = "rgba(255,255,255,0.2)";
+  ctx.lineWidth = 1;
+
+  for (let i = goalTop; i < goalBottom; i += 10) {
+    ctx.beginPath();
+    ctx.moveTo(10, i);
+    ctx.lineTo(30, i);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(canvas.width - 10, i);
+    ctx.lineTo(canvas.width - 30, i);
+    ctx.stroke();
+  }
+
+  // --- POSTES VISUALES (círculos) ---
   ctx.fillStyle = "white";
 
-  ctx.fillRect(0, 0, 10, goalTop);
-  ctx.fillRect(0, goalBottom, 10, canvas.height - goalBottom);
+  ctx.beginPath();
+  ctx.arc(10, goalTop, 5, 0, Math.PI*2);
+  ctx.fill();
 
-  ctx.fillRect(canvas.width - 10, 0, 10, goalTop);
-  ctx.fillRect(canvas.width - 10, goalBottom, 10, canvas.height - goalBottom);
+  ctx.beginPath();
+  ctx.arc(10, goalBottom, 5, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(canvas.width - 10, goalTop, 5, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(canvas.width - 10, goalBottom, 5, 0, Math.PI*2);
+  ctx.fill();
 }
 
 // LOOP
 function loop() {
   requestAnimationFrame(loop);
+
+  let now = Date.now();
+
+  if (playing && now - lastTimeUpdate >= 1000) {
+    gameTime += 1;
+    lastTimeUpdate = now;
+  }
+
+  updateTime();
 
   drawField();
 
