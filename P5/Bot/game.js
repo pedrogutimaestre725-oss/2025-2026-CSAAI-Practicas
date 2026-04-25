@@ -5,6 +5,20 @@ canvas.width = 900;
 canvas.height = 500;
 
 // UI
+
+const imgs = {
+  jude: new Image(),
+  samford: new Image(),
+  mark: new Image(),
+  axel: new Image()
+};
+
+imgs.jude.src = "Jude.png";
+imgs.samford.src = "Samford.png";
+imgs.mark.src = "Mark.png";
+imgs.axel.src = "Axel.png";
+
+
 const overlay = document.getElementById("overlay");
 const finalEl = document.getElementById("final");
 const menuEl = document.getElementById("menu");
@@ -106,17 +120,18 @@ document.addEventListener("keyup", e => {
 function updateMenu() {
   menuEl.innerHTML = `
     <h1>Elige equipo</h1>
-    <p>Q → Azul</p>
-    <p>E → Rojo</p>
+    <p>Q → Raimon</p>
+    <p>E → Royal Academy</p>
   `;
 }
 
 // --- PLAYER ---
 class Player {
-  constructor(x, y, color, role, isUser = false) {
+  constructor(x, y, color, role, isUser = false, img = null ) {
+    this.img = img;
     this.x = x;
     this.y = y;
-    this.r = 15;
+    this.r = 18;
     this.color = color;
     this.role = role;
     this.isUser = isUser;
@@ -179,7 +194,7 @@ class Player {
       }
     });
 
-    if (distance(this, ball) < 22) {
+    if (distance(this, ball) < this.r + ball.r) {
       ball.kick(this);
     }
   }
@@ -190,11 +205,39 @@ class Player {
   }
 
   draw() {
-    ctx.beginPath();
-    ctx.fillStyle = this.color;
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.save();
 
+    // recorte circular (para que la imagen sea redonda)
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+
+    // fondo blanco (para uniformidad)
+    ctx.fillStyle = "white";
+    ctx.fillRect(this.x - this.r, this.y - this.r, this.r * 2, this.r * 2);
+
+    // imagen
+    if (this.img && this.img.complete) {
+      ctx.drawImage(
+        this.img,
+        this.x - this.r,
+        this.y - this.r,
+        this.r * 2,
+        this.r * 2
+      );
+    }
+
+    ctx.restore();
+
+    // borde negro fino (pro)
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // flecha usuario (lo dejamos igual)
     if (this.isUser) {
       const len = 25;
       const ex = this.x + this.dir.x * len;
@@ -205,15 +248,6 @@ class Player {
       ctx.moveTo(this.x, this.y);
       ctx.lineTo(ex, ey);
       ctx.stroke();
-
-      // punta flecha
-      ctx.beginPath();
-      ctx.moveTo(ex, ey);
-      ctx.lineTo(ex - this.dir.x * 8 - this.dir.y * 5, ey - this.dir.y * 8 + this.dir.x * 5);
-      ctx.lineTo(ex - this.dir.x * 8 + this.dir.y * 5, ey - this.dir.y * 8 - this.dir.x * 5);
-      ctx.closePath();
-      ctx.fillStyle = "white";
-      ctx.fill();
     }
   }
 }
@@ -458,17 +492,19 @@ function handleCollisions() {
   function setupTeams() {
     if (team === "blue") {
       players = [
-        new Player(200, 250, "blue", "user", true),
-        new Player(100, 250, "blue", "defensive"),
-        new Player(700, 250, "red", "aggressive"),
-        new Player(800, 250, "red", "defensive")
+        new Player(200, 250, "blue", "user", true, imgs.axel),     // usuario
+        new Player(100, 250, "blue", "defensive", false, imgs.mark),
+
+        new Player(700, 250, "red", "aggressive", false, imgs.samford),
+        new Player(800, 250, "red", "defensive", false, imgs.jude)
       ];
     } else {
       players = [
-        new Player(700, 250, "red", "user", true),
-        new Player(800, 250, "red", "defensive"),
-        new Player(200, 250, "blue", "aggressive"),
-        new Player(100, 250, "blue", "defensive")
+        new Player(700, 250, "red", "user", true, imgs.samford),
+        new Player(800, 250, "red", "defensive", false, imgs.jude),
+
+        new Player(200, 250, "blue", "aggressive", false, imgs.axel),
+        new Player(100, 250, "blue", "defensive", false, imgs.mark)
       ];
     }
 }
