@@ -288,20 +288,59 @@ class Ball {
   }
 
   draw() {
-    // balón base
+  // sombra
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.ellipse(this.x + 4, this.y + 8, this.r, this.r - 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // base balón
+  ctx.beginPath();
+  ctx.fillStyle = "white";
+  ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // panel central (pentágono)
+  ctx.beginPath();
+  ctx.fillStyle = "black";
+  ctx.moveTo(this.x, this.y - 4);
+  ctx.lineTo(this.x + 4, this.y - 1);
+  ctx.lineTo(this.x + 2, this.y + 4);
+  ctx.lineTo(this.x - 2, this.y + 4);
+  ctx.lineTo(this.x - 4, this.y - 1);
+  ctx.closePath();
+  ctx.fill();
+
+  // paneles alrededor
+  const offsets = [
+    [-6, -5],
+    [6, -5],
+    [-6, 5],
+    [6, 5],
+    [0, 7]
+  ];
+
+  offsets.forEach(o => {
     ctx.beginPath();
-    ctx.fillStyle = "white";
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = "black";
+    ctx.arc(this.x + o[0], this.y + o[1], 2, 0, Math.PI * 2);
     ctx.fill();
+  });
 
-    // patrón simple (tipo fútbol)
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 1;
+  // líneas suaves
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 1;
 
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r - 3, 0, Math.PI * 2);
-    ctx.stroke();
-  }
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // brillo
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(255,255,255,0.6)";
+  ctx.arc(this.x - 4, this.y - 4, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+}
 }
 
 const ball = new Ball();
@@ -532,6 +571,7 @@ function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+
 function drawField() {
   // --- CÉSPED BASE ---
   ctx.fillStyle = "#1e7a3a";
@@ -569,49 +609,74 @@ function drawField() {
   ctx.strokeRect(0, canvas.height/2 - 60, 60, 120);
   ctx.strokeRect(canvas.width - 60, canvas.height/2 - 60, 60, 120);
 
-  // --- PORTERÍAS (POSTES + RED VISUAL) ---
-  ctx.fillStyle = "#cccccc";
+  // --- LÍNEAS DE FONDO CON HUECO (PORTERÍAS) ---
+ctx.strokeStyle = "white";
+ctx.lineWidth = 4;
 
-  // izquierda
-  ctx.fillRect(0, goalTop, 10, goalHeight);
+// izquierda arriba
+ctx.beginPath();
+ctx.moveTo(0, 0);
+ctx.lineTo(0, goalTop);
+ctx.stroke();
 
-  // derecha
-  ctx.fillRect(canvas.width - 10, goalTop, 10, goalHeight);
+// izquierda abajo
+ctx.beginPath();
+ctx.moveTo(0, goalBottom);
+ctx.lineTo(0, canvas.height);
+ctx.stroke();
 
-  // --- REDES (efecto visual) ---
-  ctx.strokeStyle = "rgba(255,255,255,0.2)";
-  ctx.lineWidth = 1;
+// derecha arriba
+ctx.beginPath();
+ctx.moveTo(canvas.width, 0);
+ctx.lineTo(canvas.width, goalTop);
+ctx.stroke();
 
-  for (let i = goalTop; i < goalBottom; i += 10) {
-    ctx.beginPath();
-    ctx.moveTo(10, i);
-    ctx.lineTo(30, i);
-    ctx.stroke();
+// derecha abajo
+ctx.beginPath();
+ctx.moveTo(canvas.width, goalBottom);
+ctx.lineTo(canvas.width, canvas.height);
+ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(canvas.width - 10, i);
-    ctx.lineTo(canvas.width - 30, i);
-    ctx.stroke();
-  }
 
-  // --- POSTES VISUALES (círculos) ---
-  ctx.fillStyle = "white";
+// --- MARCO PORTERÍA ---
+ctx.lineWidth = 3;
 
+// izquierda
+ctx.beginPath();
+ctx.moveTo(0, goalTop);
+ctx.lineTo(15, goalTop);
+ctx.lineTo(15, goalBottom);
+ctx.lineTo(0, goalBottom);
+ctx.stroke();
+
+// derecha
+ctx.beginPath();
+ctx.moveTo(canvas.width, goalTop);
+ctx.lineTo(canvas.width - 15, goalTop);
+ctx.lineTo(canvas.width - 15, goalBottom);
+ctx.lineTo(canvas.width, goalBottom);
+ctx.stroke();
+
+
+// --- RED ---
+ctx.strokeStyle = "rgba(255,255,255,0.3)";
+ctx.lineWidth = 1;
+
+// izquierda
+for (let y = goalTop; y < goalBottom; y += 8) {
   ctx.beginPath();
-  ctx.arc(10, goalTop, 5, 0, Math.PI*2);
-  ctx.fill();
+  ctx.moveTo(0, y);
+  ctx.lineTo(15, y);
+  ctx.stroke();
+}
 
+// derecha
+for (let y = goalTop; y < goalBottom; y += 8) {
   ctx.beginPath();
-  ctx.arc(10, goalBottom, 5, 0, Math.PI*2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(canvas.width - 10, goalTop, 5, 0, Math.PI*2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(canvas.width - 10, goalBottom, 5, 0, Math.PI*2);
-  ctx.fill();
+  ctx.moveTo(canvas.width, y);
+  ctx.lineTo(canvas.width - 15, y);
+  ctx.stroke();
+}
 }
 
 // LOOP
