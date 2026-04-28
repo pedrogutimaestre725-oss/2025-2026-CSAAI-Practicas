@@ -85,6 +85,19 @@ canvas {
   text-shadow: 0 0 15px black;
 }
 
+#scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+#scoreboard img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   canvas {

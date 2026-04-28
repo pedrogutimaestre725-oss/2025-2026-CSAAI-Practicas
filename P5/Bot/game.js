@@ -18,6 +18,17 @@ imgs.samford.src = "Samford.png";
 imgs.mark.src = "Mark.png";
 imgs.axel.src = "Axel.png";
 
+const ballImg = new Image();
+ballImg.src = "Balon.png";
+
+const logoBlue = new Image();
+logoBlue.src = "logo1.png";
+
+const logoRed = new Image();
+logoRed.src = "logo2.png";
+
+let particles = [];
+
 
 const overlay = document.getElementById("overlay");
 const finalEl = document.getElementById("final");
@@ -237,17 +248,38 @@ class Player {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // flecha usuario (lo dejamos igual)
+    // flecha usuario
     if (this.isUser) {
-      const len = 25;
-      const ex = this.x + this.dir.x * len;
-      const ey = this.y + this.dir.y * len;
+      const offset = this.r + 14;
+
+      // posición delante del jugador
+      const px = this.x + this.dir.x * offset;
+      const py = this.y + this.dir.y * offset;
+
+      // rotación según dirección
+      const angle = Math.atan2(this.dir.y, this.dir.x);
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(angle);
 
       ctx.strokeStyle = "white";
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      // símbolo >
       ctx.beginPath();
-      ctx.moveTo(this.x, this.y);
-      ctx.lineTo(ex, ey);
+      ctx.moveTo(-4, -4);
+      ctx.lineTo(5, 0);
+      ctx.lineTo(-4, 4);
       ctx.stroke();
+
+      // glow suave
+      ctx.shadowColor = "rgba(255,255,255,0.8)";
+      ctx.shadowBlur = 8;
+
+      ctx.restore();
     }
   }
 }
@@ -321,59 +353,44 @@ class Ball {
     this.vy = Math.sin(angle) * 6;
   }
 
-  draw() {
+draw() {
+  ctx.save();
+
   // sombra
   ctx.beginPath();
-  ctx.fillStyle = "rgba(0,0,0,0.3)";
-  ctx.ellipse(this.x + 4, this.y + 8, this.r, this.r - 3, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  ctx.arc(this.x + 4, this.y + 5, this.r, 0, Math.PI * 2);
   ctx.fill();
 
-  // base balón
+  // círculo recorte
   ctx.beginPath();
-  ctx.fillStyle = "white";
   ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-  ctx.fill();
-
-  // panel central (pentágono)
-  ctx.beginPath();
-  ctx.fillStyle = "black";
-  ctx.moveTo(this.x, this.y - 4);
-  ctx.lineTo(this.x + 4, this.y - 1);
-  ctx.lineTo(this.x + 2, this.y + 4);
-  ctx.lineTo(this.x - 2, this.y + 4);
-  ctx.lineTo(this.x - 4, this.y - 1);
   ctx.closePath();
-  ctx.fill();
+  ctx.clip();
 
-  // paneles alrededor
-  const offsets = [
-    [-6, -5],
-    [6, -5],
-    [-6, 5],
-    [6, 5],
-    [0, 7]
-  ];
+  // fondo blanco
+  ctx.fillStyle = "white";
+  ctx.fillRect(this.x - this.r, this.y - this.r, this.r * 2, this.r * 2);
 
-  offsets.forEach(o => {
-    ctx.beginPath();
-    ctx.fillStyle = "black";
-    ctx.arc(this.x + o[0], this.y + o[1], 2, 0, Math.PI * 2);
-    ctx.fill();
-  });
+  // imagen
+  if (ballImg.complete) {
+    ctx.drawImage(
+      ballImg,
+      this.x - this.r,
+      this.y - this.r,
+      this.r * 2,
+      this.r * 2
+    );
+  }
 
-  // líneas suaves
-  ctx.strokeStyle = "#ccc";
-  ctx.lineWidth = 1;
+  ctx.restore();
 
+  // borde
   ctx.beginPath();
   ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1.5;
   ctx.stroke();
-
-  // brillo
-  ctx.beginPath();
-  ctx.fillStyle = "rgba(255,255,255,0.6)";
-  ctx.arc(this.x - 4, this.y - 4, 2.5, 0, Math.PI * 2);
-  ctx.fill();
 }
 }
 
@@ -486,6 +503,46 @@ function handleCollisions() {
 
   }
 
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+
+    this.vx = (Math.random() - 0.5) * 10;
+    this.vy = (Math.random() - 0.5) * 10;
+
+    this.size = Math.random() * 6 + 3;
+    this.life = 60;
+
+    const colors = ["#ffeb3b", "#ff3b3b", "#00e5ff", "#ffffff", "#00ff7f"];
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+
+    this.vy += 0.15; // gravedad
+    this.life--;
+  }
+
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.life / 60;
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+
+function spawnGoalExplosion() {
+  for (let i = 0; i < 120; i++) {
+    particles.push(new Particle(canvas.width / 2, canvas.height / 2));
+  }
+}
+
   // --- EQUIPOS ---
   let players = [];
 
@@ -554,7 +611,12 @@ function updateTime() {
 
 function showGoal() {
   goalMsg.innerHTML = "⚽ GOOOOOL ⚽";
-  setTimeout(() => goalMsg.innerHTML = "", 2000);
+
+  spawnGoalExplosion();
+
+  setTimeout(() => {
+    goalMsg.innerHTML = "";
+  }, 2000);
 }
 
 function endGame(winner) {
@@ -713,7 +775,19 @@ for (let y = goalTop; y < goalBottom; y += 8) {
   ctx.lineTo(canvas.width - 15, y);
   ctx.stroke();
 }
+
+particles.forEach((p, i) => {
+  p.update();
+  p.draw();
+
+  if (p.life <= 0) {
+    particles.splice(i, 1);
+  }
+});
+
 }
+
+
 
 // LOOP
 function loop() {
