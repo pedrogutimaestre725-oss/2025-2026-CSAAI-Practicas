@@ -36,9 +36,29 @@
 <!-- CANVAS -->
 <canvas id="game"></canvas>
 
+<div id="controlsInfo">
+  WASD (controles de dirección) / Espacio para chutar / R para reiniciar la pelota
+</div>
+
 <!-- MENSAJES -->
 <div id="countdown"></div>
 <div id="goalMsg"></div>
+
+<div id="mobileControls">
+  <div class="dpad">
+    <button id="up">⬆️</button>
+    <div class="middleRow">
+      <button id="left">⬅️</button>
+      <button id="down">⬇️</button>
+      <button id="right">➡️</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="shoot">👢</button>
+    <button id="reset">R</button>
+  </div>
+</div>
 
 <script src="game.js"></script>
 </body>

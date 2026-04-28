@@ -109,6 +109,7 @@ document.addEventListener("keydown", e => {
     // 🔄 RESET BALÓN EN PARTIDA (tipo saque)
   if (e.key === "r" && playing && !gameEnded) {
     ball.reset();
+    resetPlayerPositions();
 
     // opcional: parar un momento y reanudar
     playing = false;
@@ -131,8 +132,20 @@ document.addEventListener("keyup", e => {
 function updateMenu() {
   menuEl.innerHTML = `
     <h1>Elige equipo</h1>
-    <p>Q → Raimon</p>
-    <p>E → Royal Academy</p>
+
+    <div style="display:flex; justify-content:center; gap:60px; margin-top:25px;">
+
+      <div style="text-align:center;">
+        <img src="logo1.png" style="width:70px; height:70px; display:block; margin:auto;">
+        <p>Q → Raimon</p>
+      </div>
+
+      <div style="text-align:center;">
+        <img src="logo2.png" style="width:70px; height:70px; display:block; margin:auto;">
+        <p>E → Royal Academy</p>
+      </div>
+
+    </div>
   `;
 }
 
@@ -566,6 +579,14 @@ function spawnGoalExplosion() {
     }
 }
 
+function resetPlayerPositions() {
+  players.forEach(p => {
+    p.x = p.baseX;
+    p.y = p.baseY;
+    p.dir = { x: 1, y: 0 };
+  });
+}
+
 // --- GOAL / RESTO IGUAL (sin tocar) ---
 function goal(teamScored) {
   if (gameEnded) return;
@@ -587,7 +608,7 @@ function goal(teamScored) {
     }
 
     ball.reset();
-    setupTeams();
+    resetPlayerPositions();
     startCountdown();
 
   }, 2000);
@@ -815,3 +836,97 @@ function loop() {
 }
 
 loop();
+
+/* =========================
+   CONTROLES TÁCTILES MÓVIL
+========================= */
+
+function bindTouchButton(buttonId, key) {
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
+
+  const press = (e) => {
+    e.preventDefault();
+    keys[key] = true;
+  };
+
+  const release = (e) => {
+    e.preventDefault();
+    keys[key] = false;
+  };
+
+  btn.addEventListener("touchstart", press);
+  btn.addEventListener("touchend", release);
+  btn.addEventListener("touchcancel", release);
+
+  // soporte extra por si usan ratón/tablet híbrida
+  btn.addEventListener("mousedown", press);
+  btn.addEventListener("mouseup", release);
+  btn.addEventListener("mouseleave", release);
+}
+
+// Flechas dirección
+bindTouchButton("up", "w");
+bindTouchButton("down", "s");
+bindTouchButton("left", "a");
+bindTouchButton("right", "d");
+
+// Botón disparo
+const shootBtn = document.getElementById("shoot");
+if (shootBtn) {
+  shootBtn.addEventListener("touchstart", e => {
+    e.preventDefault();
+
+    if (playing) {
+      const player = players.find(p => p.isUser);
+      if (player && distance(player, ball) < 35) {
+        ball.vx = player.dir.x * 7;
+        ball.vy = player.dir.y * 7;
+      }
+    }
+  });
+
+  shootBtn.addEventListener("mousedown", e => {
+    e.preventDefault();
+
+    if (playing) {
+      const player = players.find(p => p.isUser);
+      if (player && distance(player, ball) < 35) {
+        ball.vx = player.dir.x * 7;
+        ball.vy = player.dir.y * 7;
+      }
+    }
+  });
+}
+
+// Botón reset
+const resetBtn = document.getElementById("reset");
+if (resetBtn) {
+  resetBtn.addEventListener("touchstart", e => {
+    e.preventDefault();
+
+    if (playing && !gameEnded) {
+      ball.reset();
+      resetPlayerPositions();
+      playing = false;
+
+      setTimeout(() => {
+        startCountdown();
+      }, 300);
+    }
+  });
+
+  resetBtn.addEventListener("mousedown", e => {
+    e.preventDefault();
+
+    if (playing && !gameEnded) {
+      ball.reset();
+      resetPlayerPositions();
+      playing = false;
+
+      setTimeout(() => {
+        startCountdown();
+      }, 300);
+    }
+  });
+}
