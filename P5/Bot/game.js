@@ -4,6 +4,36 @@ const ctx = canvas.getContext("2d");
 canvas.width = 900;
 canvas.height = 500;
 
+// --- AUDIO ---
+const bgMusic = new Audio("musica.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.5;
+
+const goalSound = new Audio("Gol.mp3");
+goalSound.volume = 0.7;
+
+const kickSound = new Audio("Chute.mp3");
+kickSound.volume = 0.65;
+
+function startMusic() {
+  bgMusic.play().catch(() => {});
+}
+
+function playGoalSound() {
+  goalSound.currentTime = 0;
+  goalSound.play().catch(() => {});
+}
+
+function stopGoalSound() {
+  goalSound.pause();
+  goalSound.currentTime = 0;
+}
+
+function playKickSound() {
+  kickSound.currentTime = 0;
+  kickSound.play().catch(() => {});
+}
+
 // UI
 
 const imgs = {
@@ -75,11 +105,11 @@ document.addEventListener("keydown", e => {
   }
 
   if (menuState === "team") {
-    if (e.key === "q") {
+    if (e.key === "1") {
       team = "blue";
       startGame();
     }
-    if (e.key === "e") {
+    if (e.key === "2") {
       team = "red";
       startGame();
     }
@@ -92,6 +122,7 @@ document.addEventListener("keydown", e => {
     if (distance(player, ball) < 35) {
       ball.vx = player.dir.x * 7;
       ball.vy = player.dir.y * 7;
+      playKickSound();
     }
   }
 
@@ -137,12 +168,12 @@ function updateMenu() {
 
       <div style="text-align:center;">
         <img src="logo1.png" style="width:70px; height:70px; display:block; margin:auto;">
-        <p>Q → Raimon</p>
+        <p>1 → Raimon</p>
       </div>
 
       <div style="text-align:center;">
         <img src="logo2.png" style="width:70px; height:70px; display:block; margin:auto;">
-        <p>E → Royal Academy</p>
+        <p>2 → Royal Academy</p>
       </div>
 
     </div>
@@ -596,6 +627,7 @@ function goal(teamScored) {
   score[teamScored]++;
   updateScore();
   showGoal();
+  playGoalSound();
 
   setTimeout(() => {
 
@@ -669,6 +701,7 @@ function startCountdown() {
     } else {
       countdownEl.textContent = "YA!";
       playing = true;
+      stopGoalSound();
       setTimeout(() => countdownEl.textContent = "", 500);
       clearInterval(interval);
     }
@@ -683,12 +716,34 @@ function startGame() {
 
   setupTeams();
   ball.reset();
+  startMusic();
   startCountdown();
 }
 
 function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
+
+function resizeGame() {
+  const maxWidth = window.innerWidth * 0.98;
+  const maxHeight = window.innerHeight * 0.62;
+
+  const aspectRatio = 900 / 500;
+
+  let newWidth = maxWidth;
+  let newHeight = newWidth / aspectRatio;
+
+  if (newHeight > maxHeight) {
+    newHeight = maxHeight;
+    newWidth = newHeight * aspectRatio;
+  }
+
+  canvas.style.width = `${newWidth}px`;
+  canvas.style.height = `${newHeight}px`;
+}
+
+window.addEventListener("resize", resizeGame);
+window.addEventListener("load", resizeGame);
 
 
 function drawField() {
@@ -841,12 +896,71 @@ loop();
    CONTROLES TÁCTILES MÓVIL
 ========================= */
 
+// --- MENÚ / SELECCIÓN ---
+function handleMenuSelection(option) {
+  if (menuState === "mode") {
+    if (option === "1") {
+      mode = "golden";
+      menuState = "team";
+      updateMenu();
+    }
+
+    if (option === "2") {
+      mode = "3";
+      menuState = "team";
+      updateMenu();
+    }
+
+    return;
+  }
+
+  if (menuState === "team") {
+    if (option === "1") {
+      team = "blue";
+      startGame();
+    }
+
+    if (option === "2") {
+      team = "red";
+      startGame();
+    }
+
+    return;
+  }
+}
+
+// --- REINICIAR PARTIDA ---
+function restartMatch() {
+  score = { blue: 0, red: 0 };
+  updateScore();
+
+  gameEnded = false;
+  gameTime = 0;
+
+  overlay.style.display = "none";
+  finalEl.style.display = "none";
+
+  setupTeams();
+  ball.reset();
+  resetPlayerPositions();
+
+  startCountdown();
+}
+
+// --- BOTONES DE MOVIMIENTO ---
 function bindTouchButton(buttonId, key) {
   const btn = document.getElementById(buttonId);
   if (!btn) return;
 
   const press = (e) => {
     e.preventDefault();
+
+    // botones menú
+    if (key === "1" || key === "2") {
+      handleMenuSelection(key);
+      return;
+    }
+
     keys[key] = true;
   };
 
@@ -859,74 +973,84 @@ function bindTouchButton(buttonId, key) {
   btn.addEventListener("touchend", release);
   btn.addEventListener("touchcancel", release);
 
-  // soporte extra por si usan ratón/tablet híbrida
   btn.addEventListener("mousedown", press);
   btn.addEventListener("mouseup", release);
   btn.addEventListener("mouseleave", release);
 }
 
-// Flechas dirección
+// =========================
+// DIRECCIÓN
+// =========================
 bindTouchButton("up", "w");
 bindTouchButton("down", "s");
 bindTouchButton("left", "a");
 bindTouchButton("right", "d");
 
-// Botón disparo
+// =========================
+// BOTONES MENÚ 1 / 2
+// =========================
+bindTouchButton("btn1", "1");
+bindTouchButton("btn2", "2");
+
+// =========================
+// BOTÓN DISPARO
+// =========================
 const shootBtn = document.getElementById("shoot");
+
 if (shootBtn) {
-  shootBtn.addEventListener("touchstart", e => {
+  const shootAction = (e) => {
     e.preventDefault();
 
+    // MENÚ FINAL → volver menú principal
+    if (gameEnded) {
+      location.reload();
+      return;
+    }
+
+    // PARTIDA NORMAL → disparo
     if (playing) {
       const player = players.find(p => p.isUser);
+
       if (player && distance(player, ball) < 35) {
         ball.vx = player.dir.x * 7;
         ball.vy = player.dir.y * 7;
+        playKickSound();
       }
     }
-  });
+  };
 
-  shootBtn.addEventListener("mousedown", e => {
-    e.preventDefault();
-
-    if (playing) {
-      const player = players.find(p => p.isUser);
-      if (player && distance(player, ball) < 35) {
-        ball.vx = player.dir.x * 7;
-        ball.vy = player.dir.y * 7;
-      }
-    }
-  });
+  shootBtn.addEventListener("touchstart", shootAction);
+  shootBtn.addEventListener("mousedown", shootAction);
 }
 
-// Botón reset
+// =========================
+// BOTÓN RESET
+// =========================
 const resetBtn = document.getElementById("reset");
+
 if (resetBtn) {
-  resetBtn.addEventListener("touchstart", e => {
+  const resetAction = (e) => {
     e.preventDefault();
 
+    // MENÚ FINAL → revancha
+    if (gameEnded) {
+      restartMatch();
+      return;
+    }
+
+    // PARTIDA NORMAL → reset saque
     if (playing && !gameEnded) {
       ball.reset();
       resetPlayerPositions();
+
       playing = false;
 
       setTimeout(() => {
         startCountdown();
       }, 300);
     }
-  });
+  };
 
-  resetBtn.addEventListener("mousedown", e => {
-    e.preventDefault();
-
-    if (playing && !gameEnded) {
-      ball.reset();
-      resetPlayerPositions();
-      playing = false;
-
-      setTimeout(() => {
-        startCountdown();
-      }, 300);
-    }
-  });
+  resetBtn.addEventListener("touchstart", resetAction);
+  resetBtn.addEventListener("mousedown", resetAction);
 }

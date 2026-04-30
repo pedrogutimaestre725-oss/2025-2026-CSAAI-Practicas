@@ -2,11 +2,11 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #0a0a0a;
-  color: white;
-  text-align: center;
   background: url("Fondo.jpg") no-repeat center center fixed;
   background-size: cover;
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
 }
 
 /* UI SUPERIOR */
@@ -15,8 +15,7 @@ body {
 }
 
 #score {
-  font-size: 28px;
-  margin-top: 5px;
+  font-size: clamp(20px, 4vw, 28px);
 }
 
 #blueScore {
@@ -31,24 +30,26 @@ body {
   border-radius: 6px;
 }
 
-/* CAMPO */
+/* CANVAS RESPONSIVE REAL */
 canvas {
   display: block;
-  margin: 20px auto;
+  margin: 12px auto;
   background: #1e7a3a;
-  border: 5px solid #eee;
+  border: 4px solid #eee;
   border-radius: 10px;
   box-shadow: 0 0 25px black;
+  max-width: 98vw;
+  max-height: 65vh;
+  width: 900px;
+  height: 500px;
+  aspect-ratio: 900 / 500;
 }
 
-/* OVERLAY GENERAL */
+/* OVERLAY */
 #overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.85);
+  inset: 0;
+  background: rgba(0,0,0,0.88);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -57,14 +58,8 @@ canvas {
 }
 
 /* MENÚ */
-#menu {
-  font-size: 26px;
-  line-height: 1.8;
-}
-
-/* FINAL */
-#final {
-  font-size: 28px;
+#menu, #final {
+  font-size: clamp(20px, 4vw, 28px);
   line-height: 1.8;
 }
 
@@ -73,21 +68,22 @@ canvas {
   position: absolute;
   top: 45%;
   width: 100%;
-  font-size: 70px;
+  font-size: clamp(50px, 12vw, 90px);
   font-weight: bold;
 }
 
-/* MENSAJE GOL */
+/* GOL */
 #goalMsg {
   position: absolute;
   top: 40%;
   width: 100%;
-  font-size: 55px;
+  font-size: clamp(34px, 8vw, 60px);
   font-weight: bold;
   color: yellow;
   text-shadow: 0 0 15px black;
 }
 
+/* SCOREBOARD */
 #scoreboard {
   display: flex;
   align-items: center;
@@ -96,36 +92,18 @@ canvas {
 }
 
 #scoreboard img {
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
+  width: clamp(30px, 5vw, 38px);
+  height: clamp(30px, 5vw, 38px);
 }
 
+/* INFO */
 #controlsInfo {
-  width: 900px;
-  margin: 12px auto 0 auto;
-  text-align: center;
-  color: white;
-  font-family: Arial, sans-serif;
-  font-size: 18px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px black;
-  letter-spacing: 1px;
-  background: rgba(0,0,0,0.25);
+  width: min(900px, 95%);
+  margin: 10px auto;
+  font-size: clamp(12px, 2.5vw, 18px);
+  background: rgba(0,0,0,0.35);
   padding: 8px;
   border-radius: 10px;
-}
-
- /* RESPONSIVE */
-@media (max-width: 768px) {
-  canvas {
-    width: 95%;
-    height: auto;
-  }
-
-  #menu, #final {
-    font-size: 20px;
-  }
 }
 
 /* CONTROLES TÁCTILES */
@@ -137,11 +115,11 @@ canvas {
   #mobileControls {
     display: flex;
     position: fixed;
-    bottom: 20px;
+    bottom: max(10px, env(safe-area-inset-bottom));
     left: 0;
     width: 100%;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 4vw;
     box-sizing: border-box;
     z-index: 999;
     pointer-events: none;
@@ -149,45 +127,66 @@ canvas {
 
   #mobileControls button {
     pointer-events: auto;
-    width: 65px;
-    height: 65px;
+    width: clamp(55px, 12vw, 85px);
+    height: clamp(55px, 12vw, 85px);
     border: none;
     border-radius: 50%;
     background: rgba(0,0,0,0.55);
     color: white;
-    font-size: 28px;
+    font-size: clamp(22px, 5vw, 34px);
     font-weight: bold;
     backdrop-filter: blur(4px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
   }
 
   .dpad {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: clamp(6px, 2vw, 12px);
   }
 
   .middleRow {
     display: flex;
-    gap: 10px;
+    gap: clamp(6px, 2vw, 12px);
   }
 
   .actions {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 18px;
+    gap: clamp(12px, 3vw, 20px);
   }
 
   #shoot {
-    width: 80px;
-    height: 80px;
-    font-size: 34px;
-    background: rgba(255,140,0,0.8);
+    background: rgba(255,140,0,0.82);
+    width: clamp(75px, 15vw, 100px);
+    height: clamp(75px, 15vw, 100px);
   }
 
   #reset {
-    background: rgba(0,150,255,0.75);
+    background: rgba(0,150,255,0.78);
+  }
+
+  /* BOTONES MENÚ */
+  .menuButtons {
+    position: fixed;
+    top: 20px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 1000;
+  }
+
+  .menuButtons button {
+    width: clamp(50px, 10vw, 75px);
+    height: clamp(50px, 10vw, 75px);
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight: bold;
   }
 }
