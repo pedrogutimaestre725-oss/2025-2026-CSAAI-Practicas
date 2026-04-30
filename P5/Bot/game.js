@@ -201,10 +201,10 @@ class Player {
     if (!playing) return;
 
     if (this.isUser) {
-      if (keys["w"]) { this.y -= this.speed; this.dir = {x:0,y:-1}; }
-      if (keys["s"]) { this.y += this.speed; this.dir = {x:0,y:1}; }
-      if (keys["a"]) { this.x -= this.speed; this.dir = {x:-1,y:0}; }
-      if (keys["d"]) { this.x += this.speed; this.dir = {x:1,y:0}; }
+      if (keys.w) { this.y -= this.speed; this.dir = {x:0,y:-1}; }
+      if (keys.s) { this.y += this.speed; this.dir = {x:0,y:1}; }
+      if (keys.a) { this.x -= this.speed; this.dir = {x:-1,y:0}; }
+      if (keys.d) { this.x += this.speed; this.dir = {x:1,y:0}; }
     } else {
       this.botAI();
     }
